@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.schugarkub.dataguard.model.ApplicationInfo
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 class ApplicationsListViewModel(application: Application) : ViewModel() {
 

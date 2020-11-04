@@ -1,9 +1,5 @@
 package com.schugarkub.dataguard.view.applicationslist
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.viewmodel.applicationslist.ApplicationsListViewModel
 import com.schugarkub.dataguard.viewmodel.applicationslist.ApplicationsListViewModelFactory
-import timber.log.Timber
 
 class ApplicationsListFragment : Fragment() {
 
