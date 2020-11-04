@@ -13,6 +13,7 @@ import androidx.core.app.AppOpsManagerCompat
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 
 private const val REQUEST_USAGE_ACCESS = 100
 
@@ -30,6 +31,15 @@ class MainActivity : AppCompatActivity() {
 
         if (checkIfHaveUsageAccess()) {
             runNetworkMonitorWorker()
+        }
+
+        val containerId = R.id.fragment_container
+        var fragment = supportFragmentManager.findFragmentById(containerId)
+        if (fragment == null) {
+            fragment = ApplicationsListFragment()
+            supportFragmentManager.beginTransaction()
+                .add(containerId, fragment)
+                .commit()
         }
     }
 

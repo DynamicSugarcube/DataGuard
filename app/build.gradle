@@ -52,4 +52,10 @@ dependencies {
     // Worker
     def work_version = "2.4.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    // Recycler view
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+
+    // Lifecycle
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.2.0'
 }

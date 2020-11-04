@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Application card dimens -->
+    <dimen name="application_card_height">100dp</dimen>
+    <dimen name="application_card_corner_radius">10dp</dimen>
+    <dimen name="application_card_padding">8dp</dimen>
+    <dimen name="application_icon_size">70dp</dimen>
+</resources>
