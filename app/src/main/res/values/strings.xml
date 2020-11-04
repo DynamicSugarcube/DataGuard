@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">DataGuard</string>
+
+    <string name="threshold_reached_notification_channel_id">com.schugarkub.dataguard.ThresholdReachedChannel</string>
+    <string name="threshold_reached_notification_channel_name">Threshold Reached</string>
+    <string name="threshold_reached_notification_title">Threshold Reached</string>
 </resources>
