@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/applications_list_menu_item"
+        android:enabled="true"
+        android:icon="@drawable/ic_apps_list"
+        android:title="@string/applications_list_menu_item_title" />
+
+    <item
+        android:id="@+id/notifications_journal_menu_item"
+        android:enabled="true"
+        android:icon="@drawable/ic_notifications"
+        android:title="@string/notifications_journal_menu_item_title" />
+
+    <item
+        android:id="@+id/preferences_menu_item"
+        android:enabled="true"
+        android:icon="@drawable/ic_preferences"
+        android:title="@string/preferences_menu_item_title" />
+</menu>
