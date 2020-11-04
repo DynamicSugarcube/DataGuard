@@ -29,11 +29,60 @@
             android:id="@+id/application_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginStart="@dimen/application_title_margin"
+            android:layout_marginEnd="@dimen/application_title_margin"
             app:layout_constraintStart_toEndOf="@+id/application_icon"
             app:layout_constraintTop_toTopOf="@+id/application_icon"
             tools:text="Application" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/application_network_usage_info_block_margin"
+            android:layout_marginTop="@dimen/application_network_usage_info_block_margin"
+            android:layout_marginEnd="@dimen/application_network_usage_info_block_margin"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toEndOf="@+id/application_icon"
+            app:layout_constraintTop_toBottomOf="@+id/application_title">
+
+            <ImageView
+                android:layout_width="@dimen/application_bytes_icon_size"
+                android:layout_height="@dimen/application_bytes_icon_size"
+                android:contentDescription="@string/application_rx_bytes"
+                android:src="@drawable/ic_download" />
+
+            <TextView
+                android:id="@+id/application_rx_bytes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/application_network_usage_margin"
+                android:layout_marginEnd="@dimen/application_network_usage_margin"
+                tools:text="9 GB" />
+
+            <ImageView
+                android:layout_width="@dimen/application_bytes_icon_size"
+                android:layout_height="@dimen/application_bytes_icon_size"
+                android:contentDescription="@string/application_tx_bytes"
+                android:src="@drawable/ic_upload" />
+
+            <TextView
+                android:id="@+id/application_tx_bytes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/application_network_usage_margin"
+                android:layout_marginEnd="@dimen/application_network_usage_margin"
+                tools:text="100 MB" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/application_total_bytes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="9,1 GB" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

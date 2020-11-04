@@ -13,10 +13,16 @@ class ApplicationsListViewHolder(itemView: View) : RecyclerView.ViewHolder(itemV
 
     private val applicationIconView = itemView.findViewById<ImageView>(R.id.application_icon)
     private val applicationTitleView = itemView.findViewById<TextView>(R.id.application_title)
+    private val applicationRxBytesView = itemView.findViewById<TextView>(R.id.application_rx_bytes)
+    private val applicationTxBytesView = itemView.findViewById<TextView>(R.id.application_tx_bytes)
+    private val applicationTotalBytesView = itemView.findViewById<TextView>(R.id.application_total_bytes)
 
     fun bind(application: ApplicationInfo) {
         applicationIconView.setImageDrawable(application.icon)
         applicationTitleView.text = application.title
+        applicationRxBytesView.text = application.networkUsageInfo.formattedRxBytes
+        applicationTxBytesView.text = application.networkUsageInfo.formattedTxBytes
+        applicationTotalBytesView.text = application.networkUsageInfo.formattedTotalBytes
     }
 
     companion object {
