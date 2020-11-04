@@ -1,8 +1,6 @@
 package com.schugarkub.dataguard
 
 import android.app.PendingIntent
-import android.app.usage.NetworkStats
-import android.app.usage.NetworkStatsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInfo
@@ -18,6 +16,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.schugarkub.dataguard.model.NetworkUsageInfo
+import com.schugarkub.dataguard.utils.NetworkUsageRetriever
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -34,7 +34,7 @@ private const val TX_BYTES_THRESHOLD = 10_000L
 class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
     CoroutineWorker(context, parameters) {
 
-    private lateinit var networkStatsManager: NetworkStatsManager
+    private lateinit var networkUsageRetriever: NetworkUsageRetriever
 
     private lateinit var appPackages: List<AppPackage>
 
@@ -43,8 +43,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
 
     @Suppress("deprecation")
     override suspend fun doWork(): Result {
-        networkStatsManager = applicationContext.getSystemService(Context.NETWORK_STATS_SERVICE)
-                as NetworkStatsManager
+        networkUsageRetriever = NetworkUsageRetriever(applicationContext)
 
         packagesSyncCoroutineScope.launch {
             syncAppPackages()
@@ -81,32 +80,13 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
 
     private suspend fun monitorNetwork(networkType: Int) {
         val calendar = Calendar.getInstance()
-        var lastUsageStats = mutableMapOf<Int, NetworkUsage>()
+        var lastUsageStats = emptyMap<Int, NetworkUsageInfo>()
         while (true) {
             val endTime = calendar.timeInMillis
             val startTime = endTime - MONITOR_NETWORK_PERIOD_MS
-            val networkStats =
-                networkStatsManager.querySummary(networkType, null, startTime, endTime)
 
-            val usageStats = mutableMapOf<Int, NetworkUsage>()
-
-            val bucket = NetworkStats.Bucket()
-            while (networkStats.hasNextBucket()) {
-                networkStats.getNextBucket(bucket)
-                val uid = bucket.uid
-                val rxBytes = bucket.rxBytes
-                val txBytes = bucket.txBytes
-                if (usageStats.containsKey(uid)) {
-                    usageStats[uid]?.let {
-                        it.rxBytes += rxBytes
-                        it.txBytes += txBytes
-                    }
-                } else {
-                    usageStats[uid] = NetworkUsage(rxBytes, txBytes)
-                }
-            }
-
-            networkStats.close()
+            val usageStats =
+                networkUsageRetriever.getNetworkUsageInfo(networkType, startTime, endTime)
 
             if (lastUsageStats.isNotEmpty()) {
                 usageStats.forEach { currentUsage ->
@@ -208,10 +188,5 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
     private data class AppPackage(
         val name: String,
         val uid: Int
-    )
-
-    private data class NetworkUsage(
-        var rxBytes: Long,
-        var txBytes: Long
     )
 }

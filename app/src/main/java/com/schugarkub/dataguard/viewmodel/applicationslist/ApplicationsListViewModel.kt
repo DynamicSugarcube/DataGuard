@@ -1,26 +1,21 @@
 package com.schugarkub.dataguard.viewmodel.applicationslist
 
 import android.app.Application
-import android.app.usage.NetworkStats
-import android.app.usage.NetworkStatsManager
-import android.content.Context
 import android.net.ConnectivityManager
-import android.os.RemoteException
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.schugarkub.dataguard.model.ApplicationInfo
 import com.schugarkub.dataguard.model.NetworkUsageInfo
+import com.schugarkub.dataguard.utils.NetworkUsageRetriever
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import java.util.*
 
 class ApplicationsListViewModel(application: Application) : ViewModel() {
 
     private val packageManager = application.packageManager
-    private val networkStatsManager = application.getSystemService(Context.NETWORK_STATS_SERVICE)
-            as NetworkStatsManager
+    private val networkUsageRetriever = NetworkUsageRetriever(application.applicationContext)
 
     val applicationsLiveData by lazy {
         MutableLiveData<List<ApplicationInfo>>()
@@ -42,11 +37,11 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
         }
 
         val wifiNetworkUsageDeferred = viewModelScope.async {
-            getNetworkUsageInfo(ConnectivityManager.TYPE_WIFI, startTime, endTime)
+            networkUsageRetriever.getNetworkUsageInfo(ConnectivityManager.TYPE_WIFI, startTime, endTime)
         }
 
         val mobileNetworkUsageDeferred = viewModelScope.async {
-            getNetworkUsageInfo(ConnectivityManager.TYPE_MOBILE, startTime, endTime)
+            networkUsageRetriever.getNetworkUsageInfo(ConnectivityManager.TYPE_MOBILE, startTime, endTime)
         }
 
         runBlocking {
@@ -90,44 +85,5 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
                 icon = it.loadIcon(packageManager)
             )
         }
-    }
-
-    private fun getNetworkUsageInfo(
-        networkType: Int,
-        startTime: Long,
-        endTime: Long
-    ): Map<Int, NetworkUsageInfo> {
-        val networkUsage = mutableMapOf<Int, NetworkUsageInfo>()
-
-        try {
-            val networkStats =
-                networkStatsManager.querySummary(networkType, null, startTime, endTime)
-
-            val bucket = NetworkStats.Bucket()
-            while (networkStats.hasNextBucket()) {
-                networkStats.getNextBucket(bucket)
-
-                val uid = bucket.uid
-                val rxBytes = bucket.rxBytes
-                val txBytes = bucket.txBytes
-
-                if (networkUsage.contains(uid)) {
-                    networkUsage[uid]?.let {
-                        it.rxBytes += rxBytes
-                        it.txBytes += txBytes
-                    }
-                } else {
-                    networkUsage[uid] = NetworkUsageInfo(rxBytes, txBytes)
-                }
-            }
-
-            networkStats.close()
-        } catch (e: RemoteException) {
-            Timber.e(e, "Couldn't query network stats")
-        } catch (e: SecurityException) {
-            Timber.e(e, "Couldn't query network stats")
-        }
-
-        return networkUsage
     }
 }
