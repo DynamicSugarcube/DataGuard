@@ -21,8 +21,8 @@ class NotificationJournalViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
     fun bind(notification: NotificationInfo) {
         notificationTitleView.text = notification.title
-        notificationTimestampView.text = notification.timestamp
-        notificationNetworkTypeView.text = notification.networkType
+        notificationTimestampView.text = notification.formattedTimestamp
+        notificationNetworkTypeView.text = notification.networkType.value
         notificationApplicationIconView.setImageDrawable(
             getApplicationIconDrawable(notification.packageName)
         )

@@ -42,6 +42,7 @@
             android:layout_width="@dimen/notification_network_type_card_width"
             android:layout_marginStart="@dimen/notification_view_margin"
             android:layout_height="wrap_content"
+            app:cardCornerRadius="@dimen/notification_network_type_card_corner_radius"
             app:layout_constraintStart_toEndOf="@id/notification_application_icon"
             app:layout_constraintTop_toTopOf="@id/notification_application_icon">
 

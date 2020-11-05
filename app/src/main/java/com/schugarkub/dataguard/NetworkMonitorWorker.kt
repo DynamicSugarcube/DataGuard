@@ -17,7 +17,8 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.schugarkub.dataguard.model.NetworkUsageInfo
-import com.schugarkub.dataguard.utils.NetworkUsageRetriever
+import com.schugarkub.dataguard.model.NotificationInfo
+import com.schugarkub.dataguard.utils.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -94,7 +95,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
                     lastUsageValue?.let { value ->
                         if (currentUsage.value.txBytes - value.txBytes > TX_BYTES_THRESHOLD) {
                             if (checkUidDangerousPermissions(currentUsage.key).isNotEmpty()) {
-                                throwNotificationForUid(currentUsage.key)
+                                throwNotificationForUid(currentUsage.key, networkType)
                             }
                         }
                     }
@@ -144,7 +145,8 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
         return dangerousGrantedPermissions
     }
 
-    private fun throwNotificationForUid(uid: Int) {
+    @Suppress("deprecation")
+    private fun throwNotificationForUid(uid: Int, networkType: Int) {
         try {
             val pm = applicationContext.packageManager
             val appPackage = appPackages.find { it.uid == uid }
@@ -179,6 +181,24 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
                 with(NotificationManagerCompat.from(applicationContext)) {
                     notify(uid, notificationBuilder.build())
                 }
+
+                val notificationSentIntent = Intent().apply {
+                    action = ACTION_NOTIFICATION_SENT
+                    putExtra(
+                        EXTRA_NOTIFICATION_TITLE,
+                        applicationContext.getString(R.string.threshold_reached_notification_title)
+                    )
+                    putExtra(EXTRA_NOTIFICATION_TIMESTAMP, Calendar.getInstance().timeInMillis)
+                    putExtra(EXTRA_NOTIFICATION_APP_PACKAGE_NAME, appPackage.name)
+                    putExtra(
+                        EXTRA_NOTIFICATION_NETWORK_TYPE, when (networkType) {
+                            ConnectivityManager.TYPE_MOBILE -> NotificationInfo.NetworkType.MOBILE.value
+                            ConnectivityManager.TYPE_WIFI -> NotificationInfo.NetworkType.WIFI.value
+                            else -> NotificationInfo.NetworkType.UNKNOWN.value
+                        }
+                    )
+                }
+                applicationContext.sendBroadcast(notificationSentIntent)
             }
         } catch (e: RemoteException) {
             Timber.e(e, "Couldn't read application info for uid %d", uid)
