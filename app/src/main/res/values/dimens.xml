@@ -9,4 +9,14 @@
     <dimen name="application_network_usage_info_block_margin">20dp</dimen>
     <dimen name="application_network_usage_margin">8dp</dimen>
     <dimen name="application_bytes_icon_size">24dp</dimen>
+
+    <!-- Notification card dimens -->
+    <dimen name="notification_card_height">70dp</dimen>
+    <dimen name="notification_card_corner_radius">10dp</dimen>
+    <dimen name="notification_card_margin">8dp</dimen>
+    <dimen name="notification_card_padding">8dp</dimen>
+    <dimen name="notification_application_icon_size">24dp</dimen>
+    <dimen name="notification_view_margin">10dp</dimen>
+    <dimen name="notification_network_type_card_width">60dp</dimen>
+    <dimen name="notification_network_type_card_corner_radius">10dp</dimen>
 </resources>

@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.schugarkub.dataguard.R
+import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
 import com.schugarkub.dataguard.viewmodel.applicationslist.ApplicationsListViewModel
-import com.schugarkub.dataguard.viewmodel.applicationslist.ApplicationsListViewModelFactory
 
 class ApplicationsListFragment : Fragment() {
 
@@ -23,7 +23,7 @@ class ApplicationsListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModelFactory = ApplicationsListViewModelFactory(requireActivity().application)
+        val viewModelFactory = BaseViewModelFactory(requireActivity().application)
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ApplicationsListViewModel::class.java)
 
@@ -50,9 +50,5 @@ class ApplicationsListFragment : Fragment() {
         }
 
         return layout
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 }

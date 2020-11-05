@@ -15,4 +15,7 @@
     <string name="application_icon_description">Application icon</string>
     <string name="application_rx_bytes">Downloaded data</string>
     <string name="application_tx_bytes">Uploaded data</string>
+
+    <!-- Notification card strings -->
+    <string name="notification_application_icon_description">Application icon</string>
 </resources>
