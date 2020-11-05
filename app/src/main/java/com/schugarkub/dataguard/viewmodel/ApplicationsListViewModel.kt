@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard.viewmodel.applicationslist
+package com.schugarkub.dataguard.viewmodel
 
 import android.app.Application
 import android.net.ConnectivityManager

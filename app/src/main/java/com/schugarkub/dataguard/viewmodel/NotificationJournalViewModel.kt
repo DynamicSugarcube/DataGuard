@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard.viewmodel.notificationjournal
+package com.schugarkub.dataguard.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.MutableLiveData

@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
-import com.schugarkub.dataguard.viewmodel.notificationjournal.NotificationJournalViewModel
+import com.schugarkub.dataguard.viewmodel.NotificationJournalViewModel
 
 class NotificationsJournalFragment : Fragment() {
 
