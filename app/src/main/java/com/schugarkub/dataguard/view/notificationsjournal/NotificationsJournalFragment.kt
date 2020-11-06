@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_DATABASE_UPDATED
+import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_UPDATED
 import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
 import com.schugarkub.dataguard.viewmodel.NotificationJournalViewModel
 
@@ -30,7 +30,7 @@ class NotificationsJournalFragment : Fragment() {
 
         requireContext().registerReceiver(
             notificationsDatabaseUpdatedReceiver,
-            IntentFilter(ACTION_NOTIFICATION_DATABASE_UPDATED)
+            IntentFilter(ACTION_NOTIFICATIONS_DATABASE_UPDATED)
         )
 
         val viewModelFactory = BaseViewModelFactory(requireActivity().application)
@@ -71,7 +71,7 @@ class NotificationsJournalFragment : Fragment() {
 
         override fun onReceive(context: Context?, intent: Intent?) {
             intent?.let {
-                if (it.action == ACTION_NOTIFICATION_DATABASE_UPDATED) {
+                if (it.action == ACTION_NOTIFICATIONS_DATABASE_UPDATED) {
                     if (::viewModel.isInitialized) {
                         viewModel.syncNotifications()
                     }

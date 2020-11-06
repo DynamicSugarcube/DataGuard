@@ -16,8 +16,9 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
-import com.schugarkub.dataguard.utils.NotificationSentReceiver
+import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
 import com.schugarkub.dataguard.view.preferences.PreferencesBottomSheetFragment
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigation: BottomNavigationView
 
-    private val notificationSentBroadcastReceiver = NotificationSentReceiver()
+    private val notificationSentBroadcastReceiver = NotificationsDatabaseInteractionReceiver()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +63,10 @@ class MainActivity : AppCompatActivity() {
 
         registerReceiver(
             notificationSentBroadcastReceiver,
-            IntentFilter(ACTION_NOTIFICATION_SENT)
+            IntentFilter().apply {
+                addAction(ACTION_NOTIFICATION_SENT)
+                addAction(ACTION_NOTIFICATIONS_DATABASE_CLEAN)
+            }
         )
 
         // TODO Check if notifications are shown on top
