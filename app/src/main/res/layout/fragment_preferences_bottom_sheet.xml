@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingTop="@dimen/preference_menu_padding"
+    android:paddingBottom="@dimen/preference_menu_padding"
+    tools:context=".view.preferences.PreferencesBottomSheetFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/preference_icon_padding"
+        android:padding="@dimen/preference_item_padding"
+        android:text="@string/enable_network_monitoring"
+        app:drawableStartCompat="@drawable/ic_search" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/preference_icon_padding"
+        android:padding="@dimen/preference_item_padding"
+        android:text="@string/clean_up_notifications_journal"
+        app:drawableStartCompat="@drawable/ic_delete" />
+
+</LinearLayout>

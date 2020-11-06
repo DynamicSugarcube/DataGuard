@@ -18,4 +18,9 @@
 
     <!-- Notification card strings -->
     <string name="notification_application_icon_description">Application icon</string>
+
+    <!-- Preferences strings -->
+    <string name="enable_network_monitoring">Enable network monitoring</string>
+    <string name="disable_network_monitoring">Disable network monitoring</string>
+    <string name="clean_up_notifications_journal">Clean up notifications journal</string>
 </resources>

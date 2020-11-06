@@ -20,8 +20,7 @@ import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
 import com.schugarkub.dataguard.utils.NotificationSentReceiver
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
-import timber.log.Timber
-import kotlin.reflect.KClass
+import com.schugarkub.dataguard.view.preferences.PreferencesBottomSheetFragment
 
 private const val REQUEST_USAGE_ACCESS = 100
 
@@ -51,7 +50,7 @@ class MainActivity : AppCompatActivity() {
                         true
                     }
                     R.id.preferences_menu_item -> {
-                        // TODO Show preferences
+                        showPreferences()
                         true
                     }
                     else -> false
@@ -105,6 +104,12 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fragment_container, fragment)
                 .addToBackStack(null)
                 .commit()
+        }
+    }
+
+    private fun showPreferences() {
+        supportFragmentManager.let {
+            PreferencesBottomSheetFragment().show(it, PreferencesBottomSheetFragment.TAG)
         }
     }
 

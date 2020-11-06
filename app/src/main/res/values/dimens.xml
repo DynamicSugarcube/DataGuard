@@ -19,4 +19,9 @@
     <dimen name="notification_view_margin">10dp</dimen>
     <dimen name="notification_network_type_card_width">60dp</dimen>
     <dimen name="notification_network_type_card_corner_radius">10dp</dimen>
+
+    <!-- Preferences menu dimens -->
+    <dimen name="preference_menu_padding">12dp</dimen>
+    <dimen name="preference_item_padding">12dp</dimen>
+    <dimen name="preference_icon_padding">20dp</dimen>
 </resources>
