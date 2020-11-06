@@ -6,7 +6,7 @@ data class NetworkUsageInfo(
     var rxBytes: Long = 0L,
     var txBytes: Long = 0L
 ) {
-    private val totalBytes: Long
+    val totalBytes: Long
         get() = rxBytes + txBytes
 
     val formattedRxBytes: String

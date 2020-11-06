@@ -37,11 +37,19 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
         }
 
         val wifiNetworkUsageDeferred = viewModelScope.async {
-            networkUsageRetriever.getNetworkUsageInfo(ConnectivityManager.TYPE_WIFI, startTime, endTime)
+            networkUsageRetriever.getNetworkUsageInfo(
+                ConnectivityManager.TYPE_WIFI,
+                startTime,
+                endTime
+            )
         }
 
         val mobileNetworkUsageDeferred = viewModelScope.async {
-            networkUsageRetriever.getNetworkUsageInfo(ConnectivityManager.TYPE_MOBILE, startTime, endTime)
+            networkUsageRetriever.getNetworkUsageInfo(
+                ConnectivityManager.TYPE_MOBILE,
+                startTime,
+                endTime
+            )
         }
 
         runBlocking {
@@ -72,7 +80,8 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
                 }
             }
 
-            applicationsLiveData.value = applications.sortedBy { it.title }
+            applicationsLiveData.value =
+                applications.sortedBy { it.networkUsageInfo.totalBytes }.reversed()
         }
     }
 
