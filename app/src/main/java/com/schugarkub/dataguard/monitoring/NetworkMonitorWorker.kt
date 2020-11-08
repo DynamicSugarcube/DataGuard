@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard
+package com.schugarkub.dataguard.monitoring
 
 import android.app.PendingIntent
 import android.content.Context
@@ -14,15 +14,13 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.work.CoroutineWorker
+import androidx.work.Worker
 import androidx.work.WorkerParameters
+import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.model.NotificationInfo
 import com.schugarkub.dataguard.utils.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 import java.util.*
 
@@ -33,7 +31,7 @@ private const val MONITOR_NETWORK_PERIOD_MS = 10_000L
 private const val TX_BYTES_THRESHOLD = 10_000L
 
 class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
-    CoroutineWorker(context, parameters) {
+    Worker(context, parameters) {
 
     private lateinit var networkUsageRetriever: NetworkUsageRetriever
 
@@ -43,22 +41,34 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
     private val monitorNetworkCoroutineScope = CoroutineScope(Dispatchers.IO)
 
     @Suppress("deprecation")
-    override suspend fun doWork(): Result {
+    override fun doWork(): Result {
         networkUsageRetriever = NetworkUsageRetriever(applicationContext)
 
-        packagesSyncCoroutineScope.launch {
+        val syncPackagesDeferred = packagesSyncCoroutineScope.async {
             syncAppPackages()
         }
 
-        monitorNetworkCoroutineScope.launch {
+        val monitorWifiNetworkDeferred = monitorNetworkCoroutineScope.async {
             monitorNetwork(ConnectivityManager.TYPE_WIFI)
         }
 
-        monitorNetworkCoroutineScope.launch {
+        val monitorMobileNetworkDeferred = monitorNetworkCoroutineScope.async {
             monitorNetwork(ConnectivityManager.TYPE_MOBILE)
         }
 
+        runBlocking {
+            syncPackagesDeferred.await()
+            monitorWifiNetworkDeferred.await()
+            monitorMobileNetworkDeferred.await()
+        }
+
         return Result.success()
+    }
+
+    override fun onStopped() {
+        super.onStopped()
+        packagesSyncCoroutineScope.cancel()
+        monitorNetworkCoroutineScope.cancel()
     }
 
     private suspend fun syncAppPackages() {

@@ -3,6 +3,7 @@ package com.schugarkub.dataguard
 import android.app.AppOpsManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
@@ -11,27 +12,51 @@ import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
 import androidx.core.app.AppOpsManagerCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper
+import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.ACTION_CONTROL_NETWORK_MONITORING
+import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.EXTRA_NETWORK_MONITORING_ENABLED
+import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.KEY_NETWORK_MONITORING_ENABLED
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
 import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
 import com.schugarkub.dataguard.view.preferences.PreferencesBottomSheetFragment
+import timber.log.Timber
+import java.util.*
 
 private const val REQUEST_USAGE_ACCESS = 100
 
-private const val NETWORK_MONITOR_WORKER_NAME = "com.schugarkub.dataguard.NetworkMonitor"
-
-class MainActivity : AppCompatActivity() {
+class DataGuardActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigation: BottomNavigationView
 
     private val notificationSentBroadcastReceiver = NotificationsDatabaseInteractionReceiver()
+
+    private val networkMonitoringWorkControlReceiver = object : BroadcastReceiver() {
+
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent != null && context != null) {
+                if (intent.action == ACTION_CONTROL_NETWORK_MONITORING) {
+                    if (intent.getBooleanExtra(EXTRA_NETWORK_MONITORING_ENABLED, false)) {
+                        Timber.d("Enable network monitoring")
+                        scheduleNetworkMonitoringWork()
+                    } else {
+                        Timber.d("Disable network monitoring")
+                        NetworkMonitoringHelper.cancelWork(context)
+                    }
+                }
+            }
+        }
+    }
+
+    private var networkMonitoringWorkId: UUID? = null
+    private var networkMonitoringEnabled = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,25 +94,43 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
+        registerReceiver(
+            networkMonitoringWorkControlReceiver,
+            IntentFilter(ACTION_CONTROL_NETWORK_MONITORING)
+        )
+
         // TODO Check if notifications are shown on top
 
-        if (checkIfHaveUsageAccess()) {
-            runNetworkMonitorWorker()
-        }
+        scheduleNetworkMonitoringWork()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         unregisterReceiver(notificationSentBroadcastReceiver)
+        unregisterReceiver(networkMonitoringWorkControlReceiver)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_USAGE_ACCESS) {
-            if (checkIfHaveUsageAccess()) {
-                runNetworkMonitorWorker()
-            }
+            scheduleNetworkMonitoringWork()
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun scheduleNetworkMonitoringWork() {
+        if (haveUsageAccess()) {
+            networkMonitoringWorkId = NetworkMonitoringHelper.scheduleWork(this)
+
+            networkMonitoringWorkId?.let { uuid ->
+                WorkManager
+                    .getInstance(applicationContext)
+                    .getWorkInfoByIdLiveData(uuid)
+                    .observe(this) { info ->
+                        networkMonitoringEnabled =
+                            info != null && info.state == WorkInfo.State.RUNNING
+                    }
+            }
+        }
     }
 
     private fun initFragment() {
@@ -113,20 +156,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun showPreferences() {
         supportFragmentManager.let {
-            PreferencesBottomSheetFragment().show(it, PreferencesBottomSheetFragment.TAG)
+            PreferencesBottomSheetFragment().apply {
+                arguments = bundleOf(
+                    KEY_NETWORK_MONITORING_ENABLED to networkMonitoringEnabled
+                )
+                show(it, PreferencesBottomSheetFragment.TAG)
+            }
         }
-    }
-
-    private fun runNetworkMonitorWorker() {
-        val monitorNetworkRequest = OneTimeWorkRequestBuilder<NetworkMonitorWorker>().build()
-
-        WorkManager
-            .getInstance(applicationContext)
-            .enqueueUniqueWork(
-                NETWORK_MONITOR_WORKER_NAME,
-                ExistingWorkPolicy.KEEP,
-                monitorNetworkRequest
-            )
     }
 
     private fun createThresholdReachedNotificationChannel() {
@@ -140,7 +176,7 @@ class MainActivity : AppCompatActivity() {
         notificationManager.createNotificationChannel(notificationChannel)
     }
 
-    private fun checkIfHaveUsageAccess(): Boolean {
+    private fun haveUsageAccess(): Boolean {
         val mode = AppOpsManagerCompat.noteOp(
             applicationContext, AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName
         )
