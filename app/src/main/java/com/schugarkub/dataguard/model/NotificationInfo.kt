@@ -6,6 +6,7 @@ import java.text.DateFormat
 import java.util.*
 
 private val DATE_FORMAT = DateFormat.getDateInstance(DateFormat.MEDIUM)
+private val TIME_FORMAT = DateFormat.getTimeInstance(DateFormat.SHORT)
 
 @Entity(tableName = NOTIFICATIONS_DATABASE_NAME)
 @TypeConverters(Converter::class)
@@ -27,7 +28,10 @@ data class NotificationInfo(
 ) {
 
     val formattedTimestamp: String
-        get() = DATE_FORMAT.format(Date(timestamp))
+        get() {
+            val date = Date(timestamp)
+            return "${TIME_FORMAT.format(date)}, ${DATE_FORMAT.format(Date(timestamp))}"
+        }
 
     enum class NetworkType(val value: String) {
         MOBILE("Mobile"),
