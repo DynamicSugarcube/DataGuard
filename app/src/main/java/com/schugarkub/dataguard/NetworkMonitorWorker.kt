@@ -92,8 +92,8 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
             if (lastUsageStats.isNotEmpty()) {
                 usageStats.forEach { currentUsage ->
                     val lastUsageValue = lastUsageStats[currentUsage.key]
-                    lastUsageValue?.let { value ->
-                        if (currentUsage.value.txBytes - value.txBytes > TX_BYTES_THRESHOLD) {
+                    lastUsageValue?.let { lastUsage ->
+                        if (currentUsage.value.txBytes - lastUsage.txBytes > TX_BYTES_THRESHOLD) {
                             if (checkUidDangerousPermissions(currentUsage.key).isNotEmpty()) {
                                 throwNotificationForUid(currentUsage.key, networkType)
                             }
