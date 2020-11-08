@@ -5,17 +5,17 @@
         android:id="@+id/applications_list_menu_item"
         android:enabled="true"
         android:icon="@drawable/ic_apps_list"
-        android:title="@string/applications_list_menu_item_title" />
+        android:title="@string/bottom_navigation_applications_list_menu_item_title" />
 
     <item
         android:id="@+id/notifications_journal_menu_item"
         android:enabled="true"
         android:icon="@drawable/ic_notifications"
-        android:title="@string/notifications_journal_menu_item_title" />
+        android:title="@string/bottom_navigation_notifications_journal_menu_item_title" />
 
     <item
         android:id="@+id/preferences_menu_item"
         android:enabled="true"
         android:icon="@drawable/ic_preferences"
-        android:title="@string/preferences_menu_item_title" />
+        android:title="@string/bottom_navigation_preferences_menu_item_title" />
 </menu>
