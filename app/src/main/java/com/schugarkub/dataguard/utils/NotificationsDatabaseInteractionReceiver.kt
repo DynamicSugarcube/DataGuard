@@ -3,8 +3,8 @@ package com.schugarkub.dataguard.utils
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.schugarkub.dataguard.database.NotificationsDao
-import com.schugarkub.dataguard.database.NotificationsDatabase
+import com.schugarkub.dataguard.database.notifications.NotificationsDao
+import com.schugarkub.dataguard.database.notifications.NotificationsDatabase
 import com.schugarkub.dataguard.model.NotificationInfo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

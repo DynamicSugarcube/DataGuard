@@ -1,7 +1,7 @@
 package com.schugarkub.dataguard.model
 
 import androidx.room.*
-import com.schugarkub.dataguard.database.NOTIFICATIONS_DATABASE_NAME
+import com.schugarkub.dataguard.database.notifications.NOTIFICATIONS_DATABASE_NAME
 import java.text.DateFormat
 import java.util.*
 

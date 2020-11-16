@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard.database
+package com.schugarkub.dataguard.database.notifications
 
 import androidx.room.Dao
 import androidx.room.Insert

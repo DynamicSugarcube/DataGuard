@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.schugarkub.dataguard.database.NotificationsDatabase
+import com.schugarkub.dataguard.database.notifications.NotificationsDatabase
 import com.schugarkub.dataguard.model.NotificationInfo
 import kotlinx.coroutines.launch
 
