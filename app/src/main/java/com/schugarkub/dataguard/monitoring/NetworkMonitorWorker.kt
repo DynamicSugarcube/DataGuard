@@ -17,6 +17,9 @@ import androidx.core.graphics.drawable.toBitmap
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.schugarkub.dataguard.R
+import com.schugarkub.dataguard.database.networkusage.NetworkUsageDao
+import com.schugarkub.dataguard.database.networkusage.NetworkUsageDatabase
+import com.schugarkub.dataguard.model.NetworkUsageEntity
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.model.NotificationInfo
 import com.schugarkub.dataguard.utils.*
@@ -34,6 +37,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
     Worker(context, parameters) {
 
     private lateinit var networkUsageRetriever: NetworkUsageRetriever
+    private lateinit var networkUsageDao: NetworkUsageDao
 
     private lateinit var appPackages: List<AppPackage>
 
@@ -43,6 +47,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
     @Suppress("deprecation")
     override fun doWork(): Result {
         networkUsageRetriever = NetworkUsageRetriever(applicationContext)
+        networkUsageDao = NetworkUsageDatabase.getInstance(applicationContext).dao
 
         val syncPackagesDeferred = packagesSyncCoroutineScope.async {
             syncAppPackages()
@@ -101,11 +106,18 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
 
             if (lastUsageStats.isNotEmpty()) {
                 usageStats.forEach { currentUsage ->
-                    val lastUsageValue = lastUsageStats[currentUsage.key]
-                    lastUsageValue?.let { lastUsage ->
-                        if (currentUsage.value.txBytes - lastUsage.txBytes > TX_BYTES_THRESHOLD) {
-                            if (checkUidDangerousPermissions(currentUsage.key).isNotEmpty()) {
-                                throwNotificationForUid(currentUsage.key, networkType)
+                    val uid = currentUsage.key
+                    val current = currentUsage.value
+                    val previous = lastUsageStats[uid]
+                    if (previous != null) {
+                        val rxBytesRate = current.rxBytes - previous.rxBytes
+                        val txBytesRate = current.txBytes - previous.txBytes
+
+                        inspectRelatedEntities(uid, rxBytesRate, txBytesRate)
+
+                        if (txBytesRate > TX_BYTES_THRESHOLD) {
+                            if (checkUidDangerousPermissions(uid).isNotEmpty()) {
+                                throwNotificationForUid(uid, networkType)
                             }
                         }
                     }
@@ -114,6 +126,43 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
 
             lastUsageStats = usageStats
             delay(MONITOR_NETWORK_PERIOD_MS)
+        }
+    }
+
+    private suspend fun inspectRelatedEntities(uid: Int, rxBytesRate: Long, txBytesRate: Long) {
+        applicationContext.packageManager.getPackagesForUid(uid)?.forEach { packageName ->
+            val entity = networkUsageDao.getByPackageName(packageName)
+            if (entity != null) {
+                entity.also {
+                    if (rxBytesRate > 0 || txBytesRate > 0) {
+                        it.updateAverageRxBytesRate(rxBytesRate)
+                        it.updateAverageTxBytesRate(txBytesRate)
+                        // TODO Remove debug log
+                        Timber.d(
+                            "[NetworkUsageDatabase] Update %s:\nrxBytesRate: %d, txBytesRate: %d",
+                            it.packageName,
+                            it.averageRxBytesRate,
+                            it.averageTxBytesRate
+                        )
+                        networkUsageDao.update(it)
+                    }
+                }
+                // TODO Check deviation
+                // TODO Throw notification if the deviation is high
+            } else {
+                NetworkUsageEntity(
+                    packageName = packageName,
+                    averageRxBytesRate = rxBytesRate,
+                    averageTxBytesRate = txBytesRate
+                ).also {
+                    // TODO Remove debug log
+                    Timber.d(
+                        "[NetworkUsageDatabase] Insert %s",
+                        it.packageName
+                    )
+                    networkUsageDao.insert(it)
+                }
+            }
         }
     }
 
