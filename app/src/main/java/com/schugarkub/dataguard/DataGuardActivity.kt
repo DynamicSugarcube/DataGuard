@@ -76,7 +76,7 @@ class DataGuardActivity : AppCompatActivity() {
                     }
                     R.id.preferences_menu_item -> {
                         showPreferences()
-                        true
+                        false
                     }
                     else -> false
                 }
