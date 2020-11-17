@@ -3,9 +3,8 @@ package com.schugarkub.dataguard.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.schugarkub.dataguard.constants.NetworkUsageConstants.MAX_CALIBRATION_TIMES
 import com.schugarkub.dataguard.database.networkusage.NETWORK_USAGE_DATABASE_NAME
-
-private const val MAX_CALIBRATION_TIMES = 10_000
 
 @Entity(tableName = NETWORK_USAGE_DATABASE_NAME)
 data class NetworkUsageEntity(

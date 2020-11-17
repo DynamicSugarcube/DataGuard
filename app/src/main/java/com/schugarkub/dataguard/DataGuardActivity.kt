@@ -1,8 +1,6 @@
 package com.schugarkub.dataguard
 
 import android.app.AppOpsManager
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -24,6 +22,7 @@ import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.KEY_NETWORK_M
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
 import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver
+import com.schugarkub.dataguard.utils.NotificationsHelper
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
 import com.schugarkub.dataguard.view.preferences.PreferencesBottomSheetFragment
@@ -84,7 +83,7 @@ class DataGuardActivity : AppCompatActivity() {
             }
         }
 
-        createThresholdReachedNotificationChannel()
+        NotificationsHelper.createNotificationChannels(applicationContext)
 
         registerReceiver(
             notificationSentBroadcastReceiver,
@@ -163,17 +162,6 @@ class DataGuardActivity : AppCompatActivity() {
                 show(it, PreferencesBottomSheetFragment.TAG)
             }
         }
-    }
-
-    private fun createThresholdReachedNotificationChannel() {
-        val channelId = getString(R.string.threshold_reached_notification_channel_id)
-        val channelName = getString(R.string.threshold_reached_notification_channel_name)
-        val importance = NotificationManager.IMPORTANCE_HIGH
-        val notificationChannel = NotificationChannel(channelId, channelName, importance)
-
-        val notificationManager =
-            getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(notificationChannel)
     }
 
     private fun haveUsageAccess(): Boolean {

@@ -3,8 +3,12 @@
 
     <!-- Notifications strings -->
     <string name="threshold_reached_notification_channel_id">com.schugarkub.dataguard.ThresholdReachedChannel</string>
-    <string name="threshold_reached_notification_channel_name">Threshold Reached</string>
-    <string name="threshold_reached_notification_title">Threshold Reached</string>
+    <string name="threshold_reached_notification_channel_name">Threshold reached</string>
+    <string name="threshold_reached_notification_title">Threshold reached</string>
+    <string name="high_deviation_notification_channel_id">com.schugarkub.dataguard.HighDeviationChannel</string>
+    <string name="high_deviation_notification_channel_name">High deviation</string>
+    <string name="high_deviation_notification_title">High deviation detected</string>
+
 
     <!-- Bottom navigation strings -->
     <string name="bottom_navigation_applications_list_menu_item_title">Applications</string>
