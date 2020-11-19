@@ -7,7 +7,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
-import android.net.ConnectivityManager
 import android.net.Uri
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
@@ -15,6 +14,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.model.NotificationInfo
+import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
+import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
 import java.util.*
 
 object NotificationsHelper {
@@ -101,7 +102,6 @@ object NotificationsHelper {
         }
     }
 
-    @Suppress("Deprecation")
     private fun sendNotificationSentBroadcast(
         context: Context,
         notificationType: NotificationType,
@@ -111,8 +111,8 @@ object NotificationsHelper {
         val title = getNotificationTitleByType(context, notificationType)
         val timestamp = Calendar.getInstance().timeInMillis
         val networkTypeString = when (networkType) {
-            ConnectivityManager.TYPE_MOBILE -> NotificationInfo.NetworkType.MOBILE.value
-            ConnectivityManager.TYPE_WIFI -> NotificationInfo.NetworkType.WIFI.value
+            NETWORK_TYPE_MOBILE -> NotificationInfo.NetworkType.MOBILE.value
+            NETWORK_TYPE_WIFI -> NotificationInfo.NetworkType.WIFI.value
             else -> NotificationInfo.NetworkType.UNKNOWN.value
         }
 

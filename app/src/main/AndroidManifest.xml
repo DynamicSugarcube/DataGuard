@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.schugarkub.dataguard">
 
-    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS"
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
         tools:ignore="ProtectedPermissions" />
 
     <application
@@ -14,6 +15,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.DataGuard">
+        <service
+            android:name=".monitoring.NetworkMonitoringService"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity android:name=".DataGuardActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

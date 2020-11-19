@@ -1,33 +1,26 @@
 package com.schugarkub.dataguard
 
 import android.app.AppOpsManager
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
 import android.os.Process
 import android.provider.Settings
 import androidx.core.app.AppOpsManagerCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.ACTION_CONTROL_NETWORK_MONITORING
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.EXTRA_NETWORK_MONITORING_ENABLED
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.KEY_NETWORK_MONITORING_ENABLED
+import com.schugarkub.dataguard.monitoring.NetworkMonitoringService
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
 import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver
 import com.schugarkub.dataguard.utils.NotificationsHelper
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
+import com.schugarkub.dataguard.view.preferences.KEY_NETWORK_MONITORING_SERVICE_BINDER
 import com.schugarkub.dataguard.view.preferences.PreferencesBottomSheetFragment
 import timber.log.Timber
-import java.util.*
 
 private const val REQUEST_USAGE_ACCESS = 100
 
@@ -37,31 +30,19 @@ class DataGuardActivity : AppCompatActivity() {
 
     private val notificationSentBroadcastReceiver = NotificationsDatabaseInteractionReceiver()
 
-    private val networkMonitoringWorkControlReceiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context?, intent: Intent?) {
-            if (intent != null && context != null) {
-                if (intent.action == ACTION_CONTROL_NETWORK_MONITORING) {
-                    if (intent.getBooleanExtra(EXTRA_NETWORK_MONITORING_ENABLED, false)) {
-                        Timber.d("Enable network monitoring")
-                        scheduleNetworkMonitoringWork()
-                    } else {
-                        Timber.d("Disable network monitoring")
-                        NetworkMonitoringHelper.cancelWork(context)
-                    }
-                }
-            }
-        }
-    }
-
-    private var networkMonitoringWorkId: UUID? = null
-    private var networkMonitoringEnabled = false
+    private var serviceBinder: NetworkMonitoringService.NetworkMonitoringBinder? = null
+    private var isBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initFragment()
+
+        // TODO Start service to run it forever
+
+        val serviceIntent = Intent(this, NetworkMonitoringService::class.java)
+        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
 
         bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation).apply {
             setOnNavigationItemSelectedListener { item ->
@@ -93,41 +74,33 @@ class DataGuardActivity : AppCompatActivity() {
             }
         )
 
-        registerReceiver(
-            networkMonitoringWorkControlReceiver,
-            IntentFilter(ACTION_CONTROL_NETWORK_MONITORING)
-        )
-
         // TODO Check if notifications are shown on top
 
-        scheduleNetworkMonitoringWork()
+        startNetworkMonitoring()
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        if (isBound) {
+            unbindService(serviceConnection)
+            isBound = false
+        }
         unregisterReceiver(notificationSentBroadcastReceiver)
-        unregisterReceiver(networkMonitoringWorkControlReceiver)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_USAGE_ACCESS) {
-            scheduleNetworkMonitoringWork()
+            startNetworkMonitoring()
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun scheduleNetworkMonitoringWork() {
-        if (haveUsageAccess()) {
-            networkMonitoringWorkId = NetworkMonitoringHelper.scheduleWork(this)
-
-            networkMonitoringWorkId?.let { uuid ->
-                WorkManager
-                    .getInstance(applicationContext)
-                    .getWorkInfoByIdLiveData(uuid)
-                    .observe(this) { info ->
-                        networkMonitoringEnabled =
-                            info != null && info.state == WorkInfo.State.RUNNING
-                    }
+    private fun startNetworkMonitoring() {
+        if (isUsageAccessAllowed) {
+            serviceBinder?.let {
+                if (!it.isNetworkMonitoringEnabled) {
+                    it.startNetworkMonitoring()
+                }
             }
         }
     }
@@ -157,24 +130,43 @@ class DataGuardActivity : AppCompatActivity() {
         supportFragmentManager.let {
             PreferencesBottomSheetFragment().apply {
                 arguments = bundleOf(
-                    KEY_NETWORK_MONITORING_ENABLED to networkMonitoringEnabled
+                    KEY_NETWORK_MONITORING_SERVICE_BINDER to serviceBinder
                 )
                 show(it, PreferencesBottomSheetFragment.TAG)
             }
         }
     }
 
-    private fun haveUsageAccess(): Boolean {
-        val mode = AppOpsManagerCompat.noteOp(
-            applicationContext, AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), packageName
-        )
-        return if (mode == AppOpsManagerCompat.MODE_ALLOWED) {
-            true
-        } else {
-            // TODO Show dialog describing why it's necessary
-            val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
-            startActivityForResult(intent, REQUEST_USAGE_ACCESS)
-            false
+    private val isUsageAccessAllowed: Boolean
+        get() {
+            val mode = AppOpsManagerCompat.noteOp(
+                applicationContext,
+                AppOpsManager.OPSTR_GET_USAGE_STATS,
+                Process.myUid(),
+                packageName
+            )
+            return if (mode == AppOpsManagerCompat.MODE_ALLOWED) {
+                true
+            } else {
+                // TODO Show dialog describing why it's necessary
+                val intent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                startActivityForResult(intent, REQUEST_USAGE_ACCESS)
+                false
+            }
+        }
+
+    private val serviceConnection = object : ServiceConnection {
+
+        override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+            Timber.d("Connected to service")
+            serviceBinder = service as NetworkMonitoringService.NetworkMonitoringBinder
+            isBound = true
+        }
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            Timber.d("Disconnected from service")
+            serviceBinder = null
+            isBound = false
         }
     }
 }

@@ -4,70 +4,37 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
-import android.net.ConnectivityManager
 import android.os.Build
 import android.os.RemoteException
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import com.schugarkub.dataguard.constants.NetworkUsageConstants.MAX_BYTES_RATE_DEVIATION
-import com.schugarkub.dataguard.constants.NetworkUsageConstants.MIN_CALIBRATION_TIMES
-import com.schugarkub.dataguard.constants.NetworkUsageConstants.TX_BYTES_THRESHOLD
-import com.schugarkub.dataguard.database.networkusage.NetworkUsageDao
+import com.schugarkub.dataguard.constants.NetworkUsageConstants
 import com.schugarkub.dataguard.database.networkusage.NetworkUsageDatabase
-import com.schugarkub.dataguard.model.*
-import com.schugarkub.dataguard.utils.*
-import kotlinx.coroutines.*
+import com.schugarkub.dataguard.model.NetworkUsageEntity
+import com.schugarkub.dataguard.model.NetworkUsageInfo
+import com.schugarkub.dataguard.utils.NetworkUsageRetriever
+import com.schugarkub.dataguard.utils.NotificationsHelper
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
 import kotlin.math.abs
 
 private const val MONITOR_NETWORK_PERIOD_MS = 10_000L
 
-class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
-    Worker(context, parameters) {
+class NetworkInspector(private val context: Context) {
 
-    private lateinit var networkUsageRetriever: NetworkUsageRetriever
-    private lateinit var networkUsageDao: NetworkUsageDao
+    private val packageManager = context.packageManager
 
-    private val packagesSyncCoroutineScope = CoroutineScope(Dispatchers.Default)
-    private val monitorNetworkCoroutineScope = CoroutineScope(Dispatchers.IO)
+    private val networkUsageRetriever = NetworkUsageRetriever(context)
 
-    @Suppress("deprecation")
-    override fun doWork(): Result {
-        networkUsageRetriever = NetworkUsageRetriever(applicationContext)
-        networkUsageDao = NetworkUsageDatabase.getInstance(applicationContext).dao
+    private val networkUsageDatabaseDao = NetworkUsageDatabase.getInstance(context).dao
 
-        val monitorWifiNetworkDeferred = monitorNetworkCoroutineScope.async {
-            monitorNetwork(ConnectivityManager.TYPE_WIFI)
-        }
-
-        val monitorMobileNetworkDeferred = monitorNetworkCoroutineScope.async {
-            monitorNetwork(ConnectivityManager.TYPE_MOBILE)
-        }
-
-        runBlocking {
-            monitorWifiNetworkDeferred.await()
-            monitorMobileNetworkDeferred.await()
-        }
-
-        return Result.success()
-    }
-
-    override fun onStopped() {
-        super.onStopped()
-        packagesSyncCoroutineScope.cancel()
-        monitorNetworkCoroutineScope.cancel()
-    }
-
-    private suspend fun monitorNetwork(networkType: Int) {
+    suspend fun monitorNetwork(networkType: Int) {
         val calendar = Calendar.getInstance()
         var lastUsageStats = emptyMap<Int, NetworkUsageInfo>()
         while (true) {
             val endTime = calendar.timeInMillis
             val startTime = endTime - MONITOR_NETWORK_PERIOD_MS
 
-            val usageStats =
-                networkUsageRetriever.getNetworkUsageInfo(networkType, startTime, endTime)
+            val usageStats = networkUsageRetriever.getNetworkUsageInfo(networkType, startTime, endTime)
 
             if (lastUsageStats.isNotEmpty()) {
                 usageStats.forEach { currentUsage ->
@@ -80,13 +47,12 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
 
                         inspectRelatedEntities(networkType, uid, rxBytesRate, txBytesRate)
 
-                        if (txBytesRate > TX_BYTES_THRESHOLD) {
+                        if (txBytesRate > NetworkUsageConstants.TX_BYTES_THRESHOLD) {
                             if (checkUidDangerousPermissions(uid).isNotEmpty()) {
-                                val packageName =
-                                    applicationContext.packageManager.getPackagesForUid(uid)?.get(0)
+                                val packageName = packageManager.getPackagesForUid(uid)?.get(0)
                                 packageName?.let {
                                     NotificationsHelper.sendNotification(
-                                        applicationContext,
+                                        context,
                                         NotificationsHelper.NotificationType.THRESHOLD_REACHED,
                                         networkType,
                                         packageName
@@ -109,16 +75,16 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
         rxBytesRate: Long,
         txBytesRate: Long
     ) {
-        applicationContext.packageManager.getPackagesForUid(uid)?.forEach { packageName ->
-            val entity = networkUsageDao.getByPackageName(packageName)
+        packageManager.getPackagesForUid(uid)?.forEach { packageName ->
+            val entity = networkUsageDatabaseDao.getByPackageName(packageName)
             if (entity != null) {
                 entity.also {
-                    if (entity.txCalibrationTimes > MIN_CALIBRATION_TIMES) {
+                    if (entity.txCalibrationTimes > NetworkUsageConstants.MIN_CALIBRATION_TIMES) {
                         val txDeviation =
                             abs(txBytesRate - entity.averageTxBytesRate).toDouble() / entity.averageTxBytesRate
-                        if (txDeviation > MAX_BYTES_RATE_DEVIATION) {
+                        if (txDeviation > NetworkUsageConstants.MAX_BYTES_RATE_DEVIATION) {
                             NotificationsHelper.sendNotification(
-                                applicationContext,
+                                context,
                                 NotificationsHelper.NotificationType.HIGH_DEVIATION,
                                 networkType,
                                 packageName
@@ -130,7 +96,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
                     if (rxBytesRate > 0 || txBytesRate > 0) {
                         it.updateAverageRxBytesRate(rxBytesRate)
                         it.updateAverageTxBytesRate(txBytesRate)
-                        networkUsageDao.update(it)
+                        networkUsageDatabaseDao.update(it)
                     }
                 }
             } else {
@@ -139,7 +105,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
                     averageRxBytesRate = rxBytesRate,
                     averageTxBytesRate = txBytesRate
                 ).also {
-                    networkUsageDao.insert(it)
+                    networkUsageDatabaseDao.insert(it)
                 }
             }
         }
@@ -150,10 +116,10 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
         val dangerousGrantedPermissions = mutableListOf<String>()
 
         try {
-            val pm = applicationContext.packageManager
-            val packages = pm.getPackagesForUid(uid)
+            val packages = packageManager.getPackagesForUid(uid)
             packages?.forEach { packageName ->
-                val packageInfo = pm.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+                val packageInfo =
+                    packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
                 val permissions = packageInfo.requestedPermissions
                 val permissionsFlags = packageInfo.requestedPermissionsFlags
 
@@ -163,7 +129,7 @@ class NetworkMonitorWorker(context: Context, parameters: WorkerParameters) :
 
                 for (i in permissions.indices) {
                     if (permissionsFlags[i].and(PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0) {
-                        val permissionInfo = pm.getPermissionInfo(permissions[i], 0)
+                        val permissionInfo = packageManager.getPermissionInfo(permissions[i], 0)
                         val level = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                             permissionInfo.protection
                         } else {

@@ -8,10 +8,11 @@ import android.view.ViewGroup
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.ACTION_CONTROL_NETWORK_MONITORING
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.EXTRA_NETWORK_MONITORING_ENABLED
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringHelper.KEY_NETWORK_MONITORING_ENABLED
+import com.schugarkub.dataguard.monitoring.NetworkMonitoringService
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
+
+const val KEY_NETWORK_MONITORING_SERVICE_BINDER =
+    "com.schugarkub.dataguard.key.KEY_NETWORK_MONITORING_SERVICE_BINDER"
 
 class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -22,7 +23,7 @@ class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var controlNetworkMonitoringView: TextView
     private lateinit var cleanUpNotificationsView: TextView
 
-    private var networkMonitoringEnabled = false
+    private var serviceBinder: NetworkMonitoringService.NetworkMonitoringBinder? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,16 +32,19 @@ class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
         val layout = inflater.inflate(R.layout.fragment_preferences_bottom_sheet, container, false)
 
         controlNetworkMonitoringView = layout.findViewById(R.id.control_network_monitoring)
-        networkMonitoringEnabled = arguments?.get(KEY_NETWORK_MONITORING_ENABLED) as Boolean
-        if (networkMonitoringEnabled) {
-            controlNetworkMonitoringView.apply {
-                text = getString(R.string.disable_network_monitoring)
-                setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search_off, 0, 0, 0)
-            }
-        } else {
-            controlNetworkMonitoringView.apply {
-                text = getString(R.string.enable_network_monitoring)
-                setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
+        serviceBinder = arguments?.get(KEY_NETWORK_MONITORING_SERVICE_BINDER) as
+                NetworkMonitoringService.NetworkMonitoringBinder
+        serviceBinder?.let {
+            if (it.isNetworkMonitoringEnabled) {
+                controlNetworkMonitoringView.apply {
+                    text = getString(R.string.disable_network_monitoring)
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search_off, 0, 0, 0)
+                }
+            } else {
+                controlNetworkMonitoringView.apply {
+                    text = getString(R.string.enable_network_monitoring)
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
+                }
             }
         }
 
@@ -53,11 +57,13 @@ class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
         super.onActivityCreated(savedInstanceState)
 
         controlNetworkMonitoringView.setOnClickListener {
-            val intent = Intent().apply {
-                action = ACTION_CONTROL_NETWORK_MONITORING
-                putExtra(EXTRA_NETWORK_MONITORING_ENABLED, !networkMonitoringEnabled)
+            serviceBinder?.let {
+                if (it.isNetworkMonitoringEnabled) {
+                    it.stopNetworkMonitoring()
+                } else {
+                    it.startNetworkMonitoring()
+                }
             }
-            requireContext().sendBroadcast(intent)
             dismiss()
         }
 

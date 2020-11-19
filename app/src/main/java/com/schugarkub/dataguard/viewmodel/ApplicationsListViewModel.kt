@@ -1,12 +1,13 @@
 package com.schugarkub.dataguard.viewmodel
 
 import android.app.Application
-import android.net.ConnectivityManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.schugarkub.dataguard.model.ApplicationInfo
 import com.schugarkub.dataguard.model.NetworkUsageInfo
+import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
+import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
 import com.schugarkub.dataguard.utils.NetworkUsageRetriever
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
@@ -21,7 +22,6 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
         MutableLiveData<List<ApplicationInfo>>()
     }
 
-    @Suppress("deprecation")
     fun syncApplications() {
         // Today midnight
         val startTime = GregorianCalendar().apply {
@@ -37,19 +37,11 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
         }
 
         val wifiNetworkUsageDeferred = viewModelScope.async {
-            networkUsageRetriever.getNetworkUsageInfo(
-                ConnectivityManager.TYPE_WIFI,
-                startTime,
-                endTime
-            )
+            networkUsageRetriever.getNetworkUsageInfo(NETWORK_TYPE_WIFI, startTime, endTime)
         }
 
         val mobileNetworkUsageDeferred = viewModelScope.async {
-            networkUsageRetriever.getNetworkUsageInfo(
-                ConnectivityManager.TYPE_MOBILE,
-                startTime,
-                endTime
-            )
+            networkUsageRetriever.getNetworkUsageInfo(NETWORK_TYPE_MOBILE, startTime, endTime)
         }
 
         runBlocking {
