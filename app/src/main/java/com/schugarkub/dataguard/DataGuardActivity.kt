@@ -64,7 +64,15 @@ class DataGuardActivity : AppCompatActivity() {
             }
         }
 
-        NotificationsHelper.createNotificationChannels(applicationContext)
+        NotificationsHelper.createNotificationChannel(
+            applicationContext,
+            NotificationsHelper.NotificationType.THRESHOLD_REACHED
+        )
+
+        NotificationsHelper.createNotificationChannel(
+            applicationContext,
+            NotificationsHelper.NotificationType.HIGH_DEVIATION
+        )
 
         registerReceiver(
             notificationSentBroadcastReceiver,

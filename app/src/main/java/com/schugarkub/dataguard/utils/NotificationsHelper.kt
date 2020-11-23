@@ -12,6 +12,7 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
+import com.schugarkub.dataguard.DataGuardActivity
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.model.NotificationInfo
 import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
@@ -22,12 +23,8 @@ object NotificationsHelper {
 
     enum class NotificationType {
         THRESHOLD_REACHED,
-        HIGH_DEVIATION
-    }
-
-    fun createNotificationChannels(context: Context) {
-        createNotificationChannel(context, NotificationType.THRESHOLD_REACHED)
-        createNotificationChannel(context, NotificationType.HIGH_DEVIATION)
+        HIGH_DEVIATION,
+        NETWORK_MONITORING
     }
 
     fun sendNotification(
@@ -45,14 +42,28 @@ object NotificationsHelper {
         sendNotificationSentBroadcast(context, notificationType, networkType, packageName)
     }
 
-    private fun createNotificationChannel(context: Context, notificationType: NotificationType) {
-        val id = getNotificationChannelIdByType(context, notificationType)
-        val name = getNotificationChannelNameByType(context, notificationType)
-        val importance = NotificationManager.IMPORTANCE_HIGH
+    fun createNotificationChannel(context: Context, notificationType: NotificationType) {
+        val id = getChannelIdByType(context, notificationType)
+        val name = getChannelNameByType(context, notificationType)
+        val importance = getChannelImportanceByType(notificationType)
         val channel = NotificationChannel(id, name, importance)
 
         val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         manager.createNotificationChannel(channel)
+    }
+
+    fun buildForegroundServiceNotification(context: Context): Notification {
+        val channelId = getChannelIdByType(context, NotificationType.NETWORK_MONITORING)
+        val title = getTitleByType(context, NotificationType.NETWORK_MONITORING)
+
+        // TODO Set "open-activity" intent
+        return NotificationCompat.Builder(context, channelId)
+            .setSmallIcon(R.drawable.ic_security)
+            .setContentTitle(title)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setAutoCancel(true)
+            .build()
     }
 
     private fun buildNotification(
@@ -60,13 +71,14 @@ object NotificationsHelper {
         type: NotificationType,
         info: ApplicationInfo
     ): Notification {
-        val channelId = getNotificationChannelIdByType(context, type)
-        val title = getNotificationTitleByType(context, type)
+        val channelId = getChannelIdByType(context, type)
+        val title = getTitleByType(context, type)
 
         val appPackageName = info.packageName
         val appLabel = info.loadLabel(context.packageManager)
         val appIcon = info.loadIcon(context.packageManager).toBitmap()
 
+        // TODO Move string to res
         val text = "$appLabel: Suspicious activity detected!"
 
         val pendingIntent = PendingIntent.getActivity(
@@ -81,7 +93,7 @@ object NotificationsHelper {
         )
 
         return NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(R.drawable.ic_warning)
+            .setSmallIcon(R.drawable.ic_security)
             .setLargeIcon(appIcon)
             .setContentTitle(title)
             .setContentText(text)
@@ -108,7 +120,7 @@ object NotificationsHelper {
         networkType: Int,
         packageName: String
     ) {
-        val title = getNotificationTitleByType(context, notificationType)
+        val title = getTitleByType(context, notificationType)
         val timestamp = Calendar.getInstance().timeInMillis
         val networkTypeString = when (networkType) {
             NETWORK_TYPE_MOBILE -> NotificationInfo.NetworkType.MOBILE.value
@@ -127,30 +139,45 @@ object NotificationsHelper {
         context.sendBroadcast(intent)
     }
 
-    private fun getNotificationChannelIdByType(context: Context, type: NotificationType): String {
+    private fun getChannelIdByType(context: Context, type: NotificationType): String {
         return when (type) {
             NotificationType.THRESHOLD_REACHED ->
                 context.getString(R.string.threshold_reached_notification_channel_id)
             NotificationType.HIGH_DEVIATION ->
                 context.getString(R.string.high_deviation_notification_channel_id)
+            NotificationType.NETWORK_MONITORING ->
+                context.getString(R.string.network_monitoring_notification_channel_id)
         }
     }
 
-    private fun getNotificationChannelNameByType(context: Context, type: NotificationType): String {
+    private fun getChannelNameByType(context: Context, type: NotificationType): String {
         return when (type) {
             NotificationType.THRESHOLD_REACHED ->
                 context.getString(R.string.threshold_reached_notification_channel_name)
             NotificationType.HIGH_DEVIATION ->
                 context.getString(R.string.high_deviation_notification_channel_name)
+            NotificationType.NETWORK_MONITORING ->
+                context.getString(R.string.network_monitoring_notification_channel_name)
         }
     }
 
-    private fun getNotificationTitleByType(context: Context, type: NotificationType): String {
+    private fun getChannelImportanceByType(type: NotificationType): Int {
+        return when (type) {
+            NotificationType.THRESHOLD_REACHED, NotificationType.HIGH_DEVIATION ->
+                NotificationManager.IMPORTANCE_HIGH
+            NotificationType.NETWORK_MONITORING ->
+                NotificationManager.IMPORTANCE_LOW
+        }
+    }
+
+    private fun getTitleByType(context: Context, type: NotificationType): String {
         return when (type) {
             NotificationType.THRESHOLD_REACHED ->
                 context.getString(R.string.threshold_reached_notification_title)
             NotificationType.HIGH_DEVIATION ->
                 context.getString(R.string.high_deviation_notification_title)
+            NotificationType.NETWORK_MONITORING ->
+                context.getString(R.string.network_monitoring_notification_title)
         }
     }
 }

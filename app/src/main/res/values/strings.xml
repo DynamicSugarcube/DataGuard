@@ -8,6 +8,9 @@
     <string name="high_deviation_notification_channel_id">com.schugarkub.dataguard.HighDeviationChannel</string>
     <string name="high_deviation_notification_channel_name">High deviation</string>
     <string name="high_deviation_notification_title">High deviation detected</string>
+    <string name="network_monitoring_notification_channel_id">com.schugarkub.dataguard.NetworkMonitoring</string>
+    <string name="network_monitoring_notification_channel_name">Network monitoring</string>
+    <string name="network_monitoring_notification_title">Network monitoring enabled</string>
 
 
     <!-- Bottom navigation strings -->
