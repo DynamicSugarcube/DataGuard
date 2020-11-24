@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Notifications styles -->
+
+    <style name="NotificationApplicationLabelStyle">
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="NotificationDescriptionStyle">
+        <item name="android:ellipsize">end</item>
+        <item name="android:maxLines">1</item>
+    </style>
+
+    <style name="NotificationTimestampStyle">
+        <item name="android:padding">2dp</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+</resources>

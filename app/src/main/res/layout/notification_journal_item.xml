@@ -12,45 +12,64 @@
         android:layout_height="match_parent"
         android:padding="@dimen/notification_card_padding">
 
-        <TextView
-            android:id="@+id/notification_description"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Notification title" />
-
-        <TextView
-            android:id="@+id/notification_timestamp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/notification_description"
-            tools:text="13:00, 05.11.2020" />
-
         <ImageView
             android:id="@+id/notification_application_icon"
             android:layout_width="@dimen/notification_application_icon_size"
             android:layout_height="@dimen/notification_application_icon_size"
-            android:layout_marginTop="@dimen/notification_view_margin"
             android:contentDescription="@string/notification_application_icon_description"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/notification_description"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             tools:src="@drawable/ic_launcher_background" />
 
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/notification_network_type_card_width"
-            android:layout_marginStart="@dimen/notification_view_margin"
+        <TextView
+            android:id="@+id/notification_application_label"
+            style="@style/NotificationApplicationLabelStyle"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/notification_view_margin"
+            android:layout_marginEnd="@dimen/notification_view_margin"
+            app:layout_constraintStart_toEndOf="@+id/notification_application_icon"
+            app:layout_constraintEnd_toStartOf="@+id/notification_timestamp"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Application" />
+
+        <TextView
+            android:id="@+id/notification_timestamp"
+            style="@style/NotificationTimestampStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/notification_application_label"
+            tools:text="13:00, 05.11.2020" />
+
+        <TextView
+            android:id="@+id/notification_description"
+            style="@style/NotificationDescriptionStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/notification_view_margin"
+            android:layout_marginEnd="@dimen/notification_view_margin"
+            app:layout_constraintStart_toStartOf="@+id/notification_application_label"
+            app:layout_constraintEnd_toEndOf="@+id/notification_timestamp"
+            app:layout_constraintTop_toBottomOf="@+id/notification_timestamp"
+            tools:text="Suspicious activity description" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/notification_view_margin"
+            android:layout_marginTop="@dimen/notification_view_margin"
             app:cardCornerRadius="@dimen/notification_network_type_card_corner_radius"
             app:layout_constraintStart_toEndOf="@id/notification_application_icon"
-            app:layout_constraintTop_toTopOf="@id/notification_application_icon">
+            app:layout_constraintTop_toBottomOf="@+id/notification_description">
 
             <TextView
                 android:id="@+id/notification_network_type"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:padding="@dimen/notification_network_type_card_padding"
                 tools:text="Mobile" />
 
         </com.google.android.material.card.MaterialCardView>

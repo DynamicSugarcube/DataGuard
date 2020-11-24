@@ -14,9 +14,9 @@ import com.schugarkub.dataguard.R
 
 object NotificationsHelper {
 
-    enum class SuspiciousActivityType(val descriptionResId: Int) {
-        THRESHOLD_REACHED(R.string.threshold_reached_notification_text),
-        HIGH_DEVIATION(R.string.high_deviation_notification_text)
+    enum class SuspiciousActivityType(val textResId: Int, val descriptionResId: Int) {
+        THRESHOLD_REACHED(R.string.threshold_reached_notification_text, R.string.threshold_reached_notification_description),
+        HIGH_DEVIATION(R.string.high_deviation_notification_text, R.string.high_deviation_notification_description)
     }
 
     fun sendNotification(
@@ -47,7 +47,7 @@ object NotificationsHelper {
         val appLabel = info.loadLabel(context.packageManager)
         val appIcon = info.loadIcon(context.packageManager).toBitmap()
 
-        val text = context.getString(type.descriptionResId, appLabel)
+        val text = context.getString(type.textResId, appLabel)
 
         val pendingIntent = PendingIntent.getActivity(
             context,
