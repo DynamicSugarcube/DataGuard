@@ -1,14 +1,14 @@
 <resources>
-    <string name="app_name">DataGuard</string>
+    <string name="app_name" translatable="false">Data Guard</string>
 
     <!-- Notifications strings -->
-    <string name="threshold_reached_notification_channel_id">com.schugarkub.dataguard.ThresholdReachedChannel</string>
+    <string name="threshold_reached_notification_channel_id" translatable="false">com.schugarkub.dataguard.ThresholdReachedChannel</string>
     <string name="threshold_reached_notification_channel_name">Threshold reached</string>
     <string name="threshold_reached_notification_title">Threshold reached</string>
-    <string name="high_deviation_notification_channel_id">com.schugarkub.dataguard.HighDeviationChannel</string>
+    <string name="high_deviation_notification_channel_id" translatable="false">com.schugarkub.dataguard.HighDeviationChannel</string>
     <string name="high_deviation_notification_channel_name">High deviation</string>
     <string name="high_deviation_notification_title">High deviation detected</string>
-    <string name="network_monitoring_notification_channel_id">com.schugarkub.dataguard.NetworkMonitoring</string>
+    <string name="network_monitoring_notification_channel_id" translatable="false">com.schugarkub.dataguard.NetworkMonitoring</string>
     <string name="network_monitoring_notification_channel_name">Network monitoring</string>
     <string name="network_monitoring_notification_title">Network monitoring enabled</string>
 
@@ -25,12 +25,12 @@
     <string name="toolbar_preferences_menu_item_title">Preferences</string>
 
     <!-- Application card strings -->
-    <string name="application_icon_description">Application icon</string>
-    <string name="application_rx_bytes">Downloaded data</string>
-    <string name="application_tx_bytes">Uploaded data</string>
+    <string name="application_icon_description" translatable="false">Application icon</string>
+    <string name="application_rx_bytes" translatable="false">Downloaded data</string>
+    <string name="application_tx_bytes" translatable="false">Uploaded data</string>
 
     <!-- Notification card strings -->
-    <string name="notification_application_icon_description">Application icon</string>
+    <string name="notification_application_icon_description" translatable="false">Application icon</string>
 
     <!-- Preferences strings -->
     <string name="enable_network_monitoring">Enable network monitoring</string>
