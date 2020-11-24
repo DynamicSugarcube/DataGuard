@@ -11,10 +11,6 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.model.NotificationInfo
-import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
-import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
-import java.util.*
 
 object NotificationsHelper {
 
@@ -35,7 +31,7 @@ object NotificationsHelper {
 
         sendNotification(context, notification, info.uid)
 
-        sendNotificationSentBroadcast(context, networkType, packageName)
+        sendNotificationSentBroadcast(context, suspiciousActivityType, networkType, packageName)
     }
 
     private fun buildNotification(
@@ -86,26 +82,16 @@ object NotificationsHelper {
         }
     }
 
-    // TODO Refactor
     private fun sendNotificationSentBroadcast(
         context: Context,
+        suspiciousActivityType: SuspiciousActivityType,
         networkType: Int,
         packageName: String
     ) {
-        val title = context.getString(R.string.suspicious_activity_detected_notification_title)
-        val timestamp = Calendar.getInstance().timeInMillis
-        val networkTypeString = when (networkType) {
-            NETWORK_TYPE_MOBILE -> NotificationInfo.NetworkType.MOBILE.value
-            NETWORK_TYPE_WIFI -> NotificationInfo.NetworkType.WIFI.value
-            else -> NotificationInfo.NetworkType.UNKNOWN.value
-        }
-
-        val intent = Intent().apply {
-            action = ACTION_NOTIFICATION_SENT
-            putExtra(EXTRA_NOTIFICATION_TITLE, title)
-            putExtra(EXTRA_NOTIFICATION_TIMESTAMP, timestamp)
+        val intent = Intent(ACTION_NOTIFICATION_SENT).apply {
+            putExtra(EXTRA_NOTIFICATION_DESCRIPTION, suspiciousActivityType.descriptionResId)
             putExtra(EXTRA_NOTIFICATION_APP_PACKAGE_NAME, packageName)
-            putExtra(EXTRA_NOTIFICATION_NETWORK_TYPE, networkTypeString)
+            putExtra(EXTRA_NOTIFICATION_NETWORK_TYPE, networkType)
         }
 
         context.sendBroadcast(intent)

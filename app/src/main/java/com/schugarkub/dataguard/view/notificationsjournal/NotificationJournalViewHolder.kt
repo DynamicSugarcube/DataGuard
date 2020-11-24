@@ -1,6 +1,5 @@
 package com.schugarkub.dataguard.view.notificationsjournal
 
-import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,23 +13,22 @@ class NotificationJournalViewHolder(itemView: View) : RecyclerView.ViewHolder(it
 
     private val packageManager = itemView.context.packageManager
 
-    private val notificationTitleView = itemView.findViewById<TextView>(R.id.notification_title)
+    private val notificationDescriptionView = itemView.findViewById<TextView>(R.id.notification_description)
     private val notificationTimestampView = itemView.findViewById<TextView>(R.id.notification_timestamp)
     private val notificationApplicationIconView = itemView.findViewById<ImageView>(R.id.notification_application_icon)
     private val notificationNetworkTypeView = itemView.findViewById<TextView>(R.id.notification_network_type)
 
     fun bind(notification: NotificationInfo) {
-        notificationTitleView.text = notification.title
-        notificationTimestampView.text = notification.formattedTimestamp
-        notificationNetworkTypeView.text = notification.networkType.value
-        notificationApplicationIconView.setImageDrawable(
-            getApplicationIconDrawable(notification.packageName)
-        )
-    }
+        val appInfo = packageManager.getApplicationInfo(notification.packageName, 0)
+        val appLabel = appInfo.loadLabel(packageManager)
+        val appImage = appInfo.loadIcon(packageManager)
 
-    private fun getApplicationIconDrawable(packageName: String): Drawable {
-        val applicationInfo = packageManager.getApplicationInfo(packageName, 0)
-        return applicationInfo.loadIcon(packageManager)
+        val description = itemView.context.getString(notification.descriptionResId, appLabel)
+
+        notificationDescriptionView.text = description
+        notificationTimestampView.text = notification.formattedTimestamp
+        notificationNetworkTypeView.text = notification.getNetworkTypeString(itemView.context)
+        notificationApplicationIconView.setImageDrawable(appImage)
     }
 
     companion object {

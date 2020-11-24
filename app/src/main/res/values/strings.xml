@@ -7,10 +7,15 @@
     <string name="suspicious_activity_detected_notification_title">Suspicious activity detected</string>
     <string name="threshold_reached_notification_text">%1$s: Threshold reached</string>
     <string name="high_deviation_notification_text">%1$s: High deviation detected</string>
+    <string name="unknown_activity_notification_text">%1$s: Unknown activity</string>
     <string name="network_monitoring_notification_channel_id" translatable="false">com.schugarkub.dataguard.NetworkMonitoring</string>
     <string name="network_monitoring_notification_channel_name">Network monitoring</string>
     <string name="network_monitoring_notification_title">Network monitoring enabled</string>
 
+    <!-- Network type strings -->
+    <string name="network_type_wifi" translatable="false">Wi-Fi</string>
+    <string name="network_type_mobile">Mobile</string>
+    <string name="network_type_unknown">Unknown</string>
 
     <!-- Bottom navigation strings -->
     <string name="bottom_navigation_applications_list_menu_item_title">Applications</string>

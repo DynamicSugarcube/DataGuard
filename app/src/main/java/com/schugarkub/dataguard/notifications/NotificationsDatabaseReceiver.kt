@@ -3,6 +3,8 @@ package com.schugarkub.dataguard.notifications
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.schugarkub.dataguard.R
+import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_UNKNOWN
 import com.schugarkub.dataguard.database.notifications.NotificationsDao
 import com.schugarkub.dataguard.database.notifications.NotificationsDatabase
 import com.schugarkub.dataguard.model.NotificationInfo
@@ -18,8 +20,7 @@ const val ACTION_NOTIFICATIONS_DATABASE_UPDATED =
 const val ACTION_NOTIFICATIONS_DATABASE_CLEAN =
     "com.schugarkub.dataguard.action.NOTIFICATIONS_DATABASE_CLEAN"
 
-const val EXTRA_NOTIFICATION_TITLE = "com.schugarkub.dataguard.extra.NOTIFICATION_TITLE"
-const val EXTRA_NOTIFICATION_TIMESTAMP = "com.schugarkub.dataguard.extra.NOTIFICATION_TIMESTAMP"
+const val EXTRA_NOTIFICATION_DESCRIPTION = "com.schugarkub.dataguard.extra.NOTIFICATION_DESCRIPTION"
 const val EXTRA_NOTIFICATION_APP_PACKAGE_NAME =
     "com.schugarkub.dataguard.extra.NOTIFICATION_APP_PACKAGE_NAME"
 const val EXTRA_NOTIFICATION_NETWORK_TYPE =
@@ -46,23 +47,18 @@ class NotificationsDatabaseReceiver : BroadcastReceiver() {
     }
 
     private fun writeToDatabase(context: Context, intent: Intent) {
-        val title = intent.getStringExtra(EXTRA_NOTIFICATION_TITLE)
-        val timestamp =
-            intent.getLongExtra(EXTRA_NOTIFICATION_TIMESTAMP, Calendar.getInstance().timeInMillis)
+        val descriptionResId = intent.getIntExtra(
+            EXTRA_NOTIFICATION_DESCRIPTION,
+            R.string.unknown_activity_notification_text
+        )
         val packageName = intent.getStringExtra(EXTRA_NOTIFICATION_APP_PACKAGE_NAME)
-        val networkType = intent.getStringExtra(EXTRA_NOTIFICATION_NETWORK_TYPE)
-        if (title != null && packageName != null && networkType != null) {
+        val networkType = intent.getIntExtra(EXTRA_NOTIFICATION_NETWORK_TYPE, NETWORK_TYPE_UNKNOWN)
+        if (packageName != null) {
             val notification = NotificationInfo(
-                title = title,
-                timestamp = timestamp,
+                descriptionResId = descriptionResId,
+                timestamp = Calendar.getInstance().timeInMillis,
                 packageName = packageName,
-                networkType = when (networkType) {
-                    NotificationInfo.NetworkType.MOBILE.value ->
-                        NotificationInfo.NetworkType.MOBILE
-                    NotificationInfo.NetworkType.WIFI.value ->
-                        NotificationInfo.NetworkType.WIFI
-                    else -> NotificationInfo.NetworkType.UNKNOWN
-                }
+                networkType = networkType
             )
 
             if (::notificationsDao.isInitialized) {

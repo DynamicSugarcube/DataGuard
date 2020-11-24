@@ -4,10 +4,10 @@ import android.app.Application
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
+import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
 import com.schugarkub.dataguard.model.ApplicationInfo
 import com.schugarkub.dataguard.model.NetworkUsageInfo
-import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
-import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
 import com.schugarkub.dataguard.utils.NetworkUsageRetriever
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking

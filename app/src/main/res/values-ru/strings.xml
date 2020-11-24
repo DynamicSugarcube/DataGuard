@@ -2,11 +2,16 @@
 <resources>
     <!-- Notifications strings -->
     <string name="suspicious_activity_detected_notification_channel_name">Обнаружение подозрительной активности</string>
-    <string name="suspicious_activity_detected_notification_title">Обнаружена подозрительная активность</string>
+    <string name="suspicious_activity_detected_notification_title">Подозрительная активность</string>
     <string name="threshold_reached_notification_text">%1$s: Достигнуто пороговое значение</string>
     <string name="high_deviation_notification_text">%1$s: Замечено высокое отклонение</string>
+    <string name="unknown_activity_notification_text">%1$s: Неопознанная активность</string>
     <string name="network_monitoring_notification_channel_name">Мониторинг сети</string>
     <string name="network_monitoring_notification_title">Мониторинг сети включён</string>
+
+    <!-- Network type strings -->
+    <string name="network_type_mobile">Мобильный</string>
+    <string name="network_type_unknown">Неизвестный</string>
 
     <!-- Bottom navigation strings -->
     <string name="bottom_navigation_applications_list_menu_item_title">Приложения</string>

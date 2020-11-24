@@ -8,8 +8,8 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.schugarkub.dataguard.DataGuardActivity
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
-import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
+import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
+import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
 import kotlinx.coroutines.*
 import timber.log.Timber
 
