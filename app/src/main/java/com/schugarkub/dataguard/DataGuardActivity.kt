@@ -15,7 +15,6 @@ import com.schugarkub.dataguard.monitoring.NetworkMonitoringService
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
 import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver
-import com.schugarkub.dataguard.utils.NotificationsHelper
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
 import com.schugarkub.dataguard.view.preferences.KEY_NETWORK_MONITORING_SERVICE_BINDER
@@ -62,16 +61,6 @@ class DataGuardActivity : AppCompatActivity() {
                 }
             }
         }
-
-        NotificationsHelper.createNotificationChannel(
-            applicationContext,
-            NotificationsHelper.NotificationType.THRESHOLD_REACHED
-        )
-
-        NotificationsHelper.createNotificationChannel(
-            applicationContext,
-            NotificationsHelper.NotificationType.HIGH_DEVIATION
-        )
 
         registerReceiver(
             notificationSentBroadcastReceiver,

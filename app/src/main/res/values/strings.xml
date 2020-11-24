@@ -2,12 +2,11 @@
     <string name="app_name" translatable="false">Data Guard</string>
 
     <!-- Notifications strings -->
-    <string name="threshold_reached_notification_channel_id" translatable="false">com.schugarkub.dataguard.ThresholdReachedChannel</string>
-    <string name="threshold_reached_notification_channel_name">Threshold reached</string>
-    <string name="threshold_reached_notification_title">Threshold reached</string>
-    <string name="high_deviation_notification_channel_id" translatable="false">com.schugarkub.dataguard.HighDeviationChannel</string>
-    <string name="high_deviation_notification_channel_name">High deviation</string>
-    <string name="high_deviation_notification_title">High deviation detected</string>
+    <string name="suspicious_activity_detected_notification_channel_id" translatable="false">com.schugarkub.dataguard.SuspiciousActivityDetected</string>
+    <string name="suspicious_activity_detected_notification_channel_name">Suspicious activity detection</string>
+    <string name="suspicious_activity_detected_notification_title">Suspicious activity detected</string>
+    <string name="threshold_reached_notification_text">%1$s: Threshold reached</string>
+    <string name="high_deviation_notification_text">%1$s: High deviation detected</string>
     <string name="network_monitoring_notification_channel_id" translatable="false">com.schugarkub.dataguard.NetworkMonitoring</string>
     <string name="network_monitoring_notification_channel_name">Network monitoring</string>
     <string name="network_monitoring_notification_title">Network monitoring enabled</string>

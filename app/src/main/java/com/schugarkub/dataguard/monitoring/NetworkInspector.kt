@@ -11,7 +11,7 @@ import com.schugarkub.dataguard.database.networkusage.NetworkUsageDatabase
 import com.schugarkub.dataguard.model.NetworkUsageEntity
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.utils.NetworkUsageRetriever
-import com.schugarkub.dataguard.utils.NotificationsHelper
+import com.schugarkub.dataguard.notifications.NotificationsHelper
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
@@ -53,7 +53,7 @@ class NetworkInspector(private val context: Context) {
                                 packageName?.let {
                                     NotificationsHelper.sendNotification(
                                         context,
-                                        NotificationsHelper.NotificationType.THRESHOLD_REACHED,
+                                        NotificationsHelper.SuspiciousActivityType.THRESHOLD_REACHED,
                                         networkType,
                                         packageName
                                     )
@@ -85,7 +85,7 @@ class NetworkInspector(private val context: Context) {
                         if (txDeviation > NetworkUsageConstants.MAX_BYTES_RATE_DEVIATION) {
                             NotificationsHelper.sendNotification(
                                 context,
-                                NotificationsHelper.NotificationType.HIGH_DEVIATION,
+                                NotificationsHelper.SuspiciousActivityType.HIGH_DEVIATION,
                                 networkType,
                                 packageName
                             )

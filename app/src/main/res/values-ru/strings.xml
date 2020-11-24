@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Notifications strings -->
-    <string name="threshold_reached_notification_channel_name">Достигнут порог</string>
-    <string name="threshold_reached_notification_title">Достигнут порог</string>
-    <string name="high_deviation_notification_channel_name">Высокое отклонение</string>
-    <string name="high_deviation_notification_title">Замечено высокое отклонение</string>
+    <string name="suspicious_activity_detected_notification_channel_name">Обнаружение подозрительной активности</string>
+    <string name="suspicious_activity_detected_notification_title">Обнаружена подозрительная активность</string>
+    <string name="threshold_reached_notification_text">%1$s: Достигнуто пороговое значение</string>
+    <string name="high_deviation_notification_text">%1$s: Замечено высокое отклонение</string>
     <string name="network_monitoring_notification_channel_name">Мониторинг сети</string>
     <string name="network_monitoring_notification_title">Мониторинг сети включён</string>
 

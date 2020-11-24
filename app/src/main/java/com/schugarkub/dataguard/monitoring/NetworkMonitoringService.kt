@@ -1,12 +1,15 @@
 package com.schugarkub.dataguard.monitoring
 
-import android.app.Service
+import android.app.*
+import android.content.Context
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import androidx.core.app.NotificationCompat
+import com.schugarkub.dataguard.DataGuardActivity
+import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
-import com.schugarkub.dataguard.utils.NotificationsHelper
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -30,10 +33,7 @@ class NetworkMonitoringService : Service() {
         super.onCreate()
         networkInspector = NetworkInspector(applicationContext)
 
-        NotificationsHelper.createNotificationChannel(
-            applicationContext,
-            NotificationsHelper.NotificationType.NETWORK_MONITORING
-        )
+        createNotificationChannels()
 
         startNetworkMonitoring()
     }
@@ -43,12 +43,46 @@ class NetworkMonitoringService : Service() {
         stopNetworkMonitoring()
     }
 
+    private fun createNotificationChannels() {
+        val networkMonitoringChannel = NotificationChannel(
+            applicationContext.getString(R.string.network_monitoring_notification_channel_id),
+            applicationContext.getString(R.string.network_monitoring_notification_channel_name),
+            NotificationManager.IMPORTANCE_LOW
+        )
+
+        val suspiciousActivityChannel = NotificationChannel(
+            applicationContext.getString(R.string.suspicious_activity_detected_notification_channel_id),
+            applicationContext.getString(R.string.suspicious_activity_detected_notification_channel_name),
+            NotificationManager.IMPORTANCE_HIGH
+        )
+
+        with(applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager) {
+            createNotificationChannel(networkMonitoringChannel)
+            createNotificationChannel(suspiciousActivityChannel)
+        }
+    }
+
+    private fun buildForegroundNotification(): Notification {
+        val channelId =
+            applicationContext.getString(R.string.network_monitoring_notification_channel_id)
+        val title = applicationContext.getString(R.string.network_monitoring_notification_title)
+        val pendingIntent = Intent(applicationContext, DataGuardActivity::class.java).let {
+            PendingIntent.getActivity(applicationContext, 0, it, 0)
+        }
+
+        return NotificationCompat.Builder(applicationContext, channelId)
+            .setSmallIcon(R.drawable.ic_security)
+            .setContentTitle(title)
+            .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_MAX)
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setAutoCancel(true)
+            .build()
+    }
+
     private fun startNetworkMonitoring() {
         Timber.d("Start network monitoring")
-        startForeground(
-            NETWORK_MONITORING_SERVICE_NOTIFICATION_ID,
-            NotificationsHelper.buildForegroundServiceNotification(applicationContext)
-        )
+        startForeground(NETWORK_MONITORING_SERVICE_NOTIFICATION_ID, buildForegroundNotification())
 
         if (::networkInspector.isInitialized) {
             monitorNetworkCoroutineScope.launch {
