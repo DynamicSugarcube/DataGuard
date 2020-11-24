@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
-import com.schugarkub.dataguard.model.ApplicationInfo
+import com.schugarkub.dataguard.model.AppPackageInfo
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.utils.NetworkUsageRetriever
 import kotlinx.coroutines.async
@@ -19,7 +19,7 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
     private val networkUsageRetriever = NetworkUsageRetriever(application.applicationContext)
 
     val applicationsLiveData by lazy {
-        MutableLiveData<List<ApplicationInfo>>()
+        MutableLiveData<List<AppPackageInfo>>()
     }
 
     fun syncApplications() {
@@ -77,13 +77,11 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
         }
     }
 
-    private fun getApplications(): List<ApplicationInfo> {
+    private fun getApplications(): List<AppPackageInfo> {
         return packageManager.getInstalledApplications(0).map {
-            ApplicationInfo(
-                packageName = it.packageName,
-                uid = it.uid,
-                title = it.loadLabel(packageManager).toString(),
-                icon = it.loadIcon(packageManager)
+            AppPackageInfo(
+                name = it.packageName,
+                uid = it.uid
             )
         }
     }

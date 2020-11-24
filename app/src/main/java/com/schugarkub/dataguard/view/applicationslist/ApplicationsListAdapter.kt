@@ -2,11 +2,11 @@ package com.schugarkub.dataguard.view.applicationslist
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.schugarkub.dataguard.model.ApplicationInfo
+import com.schugarkub.dataguard.model.AppPackageInfo
 
 class ApplicationsListAdapter : RecyclerView.Adapter<ApplicationsListViewHolder>() {
 
-    var applications = emptyList<ApplicationInfo>()
+    var applications = emptyList<AppPackageInfo>()
         set(value) {
             field = value
             notifyDataSetChanged()

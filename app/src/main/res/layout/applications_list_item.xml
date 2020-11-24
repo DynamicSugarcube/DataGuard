@@ -27,12 +27,14 @@
 
         <TextView
             android:id="@+id/application_title"
+            style="@style/ApplicationTitleStyle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/application_title_margin"
             android:layout_marginEnd="@dimen/application_title_margin"
             app:layout_constraintStart_toEndOf="@+id/application_icon"
             app:layout_constraintTop_toTopOf="@+id/application_icon"
+            app:layout_constraintEnd_toEndOf="@id/application_total_bytes"
             tools:text="Application" />
 
         <LinearLayout
