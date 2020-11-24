@@ -39,10 +39,9 @@ class DataGuardActivity : AppCompatActivity() {
 
         initFragment()
 
-        // TODO Start service to run it forever
-
         val serviceIntent = Intent(this, NetworkMonitoringService::class.java)
-        bindService(serviceIntent, serviceConnection, BIND_AUTO_CREATE)
+        startService(serviceIntent)
+        bindService(serviceIntent, serviceConnection, 0)
 
         bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation).apply {
             setOnNavigationItemSelectedListener { item ->

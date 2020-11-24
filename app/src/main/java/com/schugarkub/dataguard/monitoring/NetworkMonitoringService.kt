@@ -35,10 +35,6 @@ class NetworkMonitoringService : Service() {
             NotificationsHelper.NotificationType.NETWORK_MONITORING
         )
 
-        val notification =
-            NotificationsHelper.buildForegroundServiceNotification(applicationContext)
-        startForeground(NETWORK_MONITORING_SERVICE_NOTIFICATION_ID, notification)
-
         startNetworkMonitoring()
     }
 
@@ -49,6 +45,11 @@ class NetworkMonitoringService : Service() {
 
     private fun startNetworkMonitoring() {
         Timber.d("Start network monitoring")
+        startForeground(
+            NETWORK_MONITORING_SERVICE_NOTIFICATION_ID,
+            NotificationsHelper.buildForegroundServiceNotification(applicationContext)
+        )
+
         if (::networkInspector.isInitialized) {
             monitorNetworkCoroutineScope.launch {
                 networkInspector.monitorNetwork(NETWORK_TYPE_WIFI)
@@ -57,14 +58,18 @@ class NetworkMonitoringService : Service() {
                 networkInspector.monitorNetwork(NETWORK_TYPE_MOBILE)
             }
         }
+
         isMonitoringEnabled = true
     }
 
     private fun stopNetworkMonitoring() {
         Timber.d("Stop network monitoring")
+        stopForeground(true)
+
         if (monitorNetworkCoroutineScope.isActive) {
             monitorNetworkCoroutineScope.cancel()
         }
+
         isMonitoringEnabled = false
     }
 
