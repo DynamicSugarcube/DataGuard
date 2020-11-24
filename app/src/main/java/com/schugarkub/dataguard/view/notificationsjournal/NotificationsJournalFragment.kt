@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_UPDATED
+import com.schugarkub.dataguard.notifications.ACTION_NOTIFICATIONS_DATABASE_UPDATED
 import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
 import com.schugarkub.dataguard.viewmodel.NotificationJournalViewModel
 

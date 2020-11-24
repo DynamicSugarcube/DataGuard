@@ -12,9 +12,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.schugarkub.dataguard.service.NetworkMonitoringService
-import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
-import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
-import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment
 import com.schugarkub.dataguard.view.preferences.KEY_NETWORK_MONITORING_SERVICE_BINDER
@@ -26,8 +23,6 @@ private const val REQUEST_USAGE_ACCESS = 100
 class DataGuardActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigation: BottomNavigationView
-
-    private val notificationSentBroadcastReceiver = NotificationsDatabaseInteractionReceiver()
 
     private var serviceBinder: NetworkMonitoringService.NetworkMonitoringBinder? = null
     private var isBound = false
@@ -62,14 +57,6 @@ class DataGuardActivity : AppCompatActivity() {
             }
         }
 
-        registerReceiver(
-            notificationSentBroadcastReceiver,
-            IntentFilter().apply {
-                addAction(ACTION_NOTIFICATION_SENT)
-                addAction(ACTION_NOTIFICATIONS_DATABASE_CLEAN)
-            }
-        )
-
         // TODO Check if notifications are shown on top
 
         startNetworkMonitoring()
@@ -81,7 +68,6 @@ class DataGuardActivity : AppCompatActivity() {
             unbindService(serviceConnection)
             isBound = false
         }
-        unregisterReceiver(notificationSentBroadcastReceiver)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

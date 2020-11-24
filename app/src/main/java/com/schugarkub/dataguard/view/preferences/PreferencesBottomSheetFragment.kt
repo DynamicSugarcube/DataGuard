@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.service.NetworkMonitoringService
-import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
+import com.schugarkub.dataguard.notifications.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 
 const val KEY_NETWORK_MONITORING_SERVICE_BINDER =
     "com.schugarkub.dataguard.key.KEY_NETWORK_MONITORING_SERVICE_BINDER"

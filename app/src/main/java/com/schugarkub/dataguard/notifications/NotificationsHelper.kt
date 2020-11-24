@@ -12,7 +12,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.model.NotificationInfo
-import com.schugarkub.dataguard.utils.*
 import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.utils.ConnectivityWrapper.NETWORK_TYPE_WIFI
 import java.util.*

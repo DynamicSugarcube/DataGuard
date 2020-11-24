@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard.utils
+package com.schugarkub.dataguard.notifications
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -25,7 +25,7 @@ const val EXTRA_NOTIFICATION_APP_PACKAGE_NAME =
 const val EXTRA_NOTIFICATION_NETWORK_TYPE =
     "com.schugarkub.dataguard.extra.NOTIFICATION_NETWORK_TYPE"
 
-class NotificationsDatabaseInteractionReceiver : BroadcastReceiver() {
+class NotificationsDatabaseReceiver : BroadcastReceiver() {
 
     private val coroutineJob = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.IO + coroutineJob)
