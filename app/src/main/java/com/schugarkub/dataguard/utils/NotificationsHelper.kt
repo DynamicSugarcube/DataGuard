@@ -56,10 +56,14 @@ object NotificationsHelper {
         val channelId = getChannelIdByType(context, NotificationType.NETWORK_MONITORING)
         val title = getTitleByType(context, NotificationType.NETWORK_MONITORING)
 
-        // TODO Set "open-activity" intent
+        val pendingIntent = Intent(context, DataGuardActivity::class.java).let {
+            PendingIntent.getActivity(context, 0, it, 0)
+        }
+
         return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_security)
             .setContentTitle(title)
+            .setContentIntent(pendingIntent)
             .setPriority(NotificationCompat.PRIORITY_MAX)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
