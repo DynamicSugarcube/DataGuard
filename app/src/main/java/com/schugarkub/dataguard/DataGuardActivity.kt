@@ -11,7 +11,7 @@ import androidx.core.app.AppOpsManagerCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.schugarkub.dataguard.monitoring.NetworkMonitoringService
+import com.schugarkub.dataguard.service.NetworkMonitoringService
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.utils.ACTION_NOTIFICATION_SENT
 import com.schugarkub.dataguard.utils.NotificationsDatabaseInteractionReceiver

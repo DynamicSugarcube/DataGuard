@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard.monitoring
+package com.schugarkub.dataguard.service
 
 import android.app.*
 import android.content.Context

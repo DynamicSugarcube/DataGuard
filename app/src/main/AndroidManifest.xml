@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DataGuard">
         <service
-            android:name=".monitoring.NetworkMonitoringService"
+            android:name=".service.NetworkMonitoringService"
             android:enabled="true"
             android:exported="false" />
 
