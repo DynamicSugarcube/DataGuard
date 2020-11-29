@@ -12,7 +12,10 @@ import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-const val NETWORK_MONITORING_SERVICE_NOTIFICATION_ID = 100_000
+private const val NETWORK_MONITORING_SERVICE_NOTIFICATION_ID = 100_000
+
+private const val STATE_MONITORING_ENABLED = 1
+private const val STATE_MONITORING_DISABLED = -1
 
 class NetworkMonitoringService : Service() {
 
@@ -34,12 +37,14 @@ class NetworkMonitoringService : Service() {
 
         createNotificationChannels()
 
-        startNetworkMonitoring()
+        setNetworkMonitoringState(STATE_MONITORING_ENABLED)
+        startForeground(NETWORK_MONITORING_SERVICE_NOTIFICATION_ID, buildForegroundNotification())
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        stopNetworkMonitoring()
+        stopForeground(true)
+        setNetworkMonitoringState(STATE_MONITORING_DISABLED)
     }
 
     private fun createNotificationChannels() {
@@ -79,31 +84,32 @@ class NetworkMonitoringService : Service() {
             .build()
     }
 
-    private fun startNetworkMonitoring() {
-        Timber.d("Start network monitoring")
-        startForeground(NETWORK_MONITORING_SERVICE_NOTIFICATION_ID, buildForegroundNotification())
+    private fun setNetworkMonitoringState(state: Int) {
+        when (state) {
+            STATE_MONITORING_ENABLED -> {
+                Timber.d("Network monitoring enabled")
 
-        if (::networkInspector.isInitialized) {
-            monitorNetworkCoroutineScope.launch {
-                networkInspector.monitorNetwork(NETWORK_TYPE_WIFI)
+                if (::networkInspector.isInitialized) {
+                    monitorNetworkCoroutineScope.launch {
+                        networkInspector.monitorNetwork(NETWORK_TYPE_WIFI)
+                    }
+                    monitorNetworkCoroutineScope.launch {
+                        networkInspector.monitorNetwork(NETWORK_TYPE_MOBILE)
+                    }
+                }
+
+                isNetworkMonitoringEnabled = true
             }
-            monitorNetworkCoroutineScope.launch {
-                networkInspector.monitorNetwork(NETWORK_TYPE_MOBILE)
+            STATE_MONITORING_DISABLED -> {
+                Timber.d("Network monitoring disabled")
+
+                if (monitorNetworkCoroutineScope.isActive) {
+                    monitorNetworkCoroutineScope.cancel()
+                }
+
+                isNetworkMonitoringEnabled = false
             }
         }
-
-        isNetworkMonitoringEnabled = true
-    }
-
-    private fun stopNetworkMonitoring() {
-        Timber.d("Stop network monitoring")
-        stopForeground(true)
-
-        if (monitorNetworkCoroutineScope.isActive) {
-            monitorNetworkCoroutineScope.cancel()
-        }
-
-        isNetworkMonitoringEnabled = false
     }
 
     companion object {
