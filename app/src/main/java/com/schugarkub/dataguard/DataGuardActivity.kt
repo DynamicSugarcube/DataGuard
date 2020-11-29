@@ -8,6 +8,7 @@ import android.os.Process
 import android.provider.Settings
 import androidx.core.app.AppOpsManagerCompat
 import androidx.fragment.app.Fragment
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.schugarkub.dataguard.service.NetworkMonitoringService
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
@@ -20,21 +21,42 @@ class DataGuardActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigation: BottomNavigationView
 
+    private lateinit var toolbar: MaterialToolbar
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         initFragment()
 
+        toolbar = findViewById<MaterialToolbar>(R.id.toolbar).apply {
+            setTitle(R.string.applications_toolbar_title)
+            setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.toolbar_search_menu_item -> {
+                        // TODO Implement search
+                        false
+                    }
+                    R.id.toolbar_preferences_menu_item -> {
+                        showPreferences()
+                        false
+                    }
+                    else -> false
+                }
+            }
+        }
+
         bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation).apply {
             setOnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.applications_list_menu_item -> {
                         updateFragment(ApplicationsListFragment::class.java)
+                        toolbar.setTitle(R.string.applications_toolbar_title)
                         true
                     }
                     R.id.notifications_journal_menu_item -> {
                         updateFragment(NotificationsJournalFragment::class.java)
+                        toolbar.setTitle(R.string.notifications_toolbar_title)
                         true
                     }
                     R.id.preferences_menu_item -> {

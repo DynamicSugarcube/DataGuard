@@ -7,6 +7,12 @@
     android:orientation="vertical"
     tools:context=".DataGuardActivity">
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:menu="@menu/toolbar_menu" />
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
