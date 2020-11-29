@@ -23,7 +23,6 @@
     <!-- Toolbar strings -->
     <string name="applications_toolbar_title">Приложения</string>
     <string name="notifications_toolbar_title">Уведомления</string>
-    <string name="toolbar_search_menu_item_title">Поиск</string>
     <string name="toolbar_preferences_menu_item_title">Настройки</string>
 
     <!-- Preferences strings -->

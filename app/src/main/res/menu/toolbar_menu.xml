@@ -3,12 +3,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/toolbar_search_menu_item"
-        android:icon="@drawable/ic_search"
-        android:title="@string/toolbar_search_menu_item_title"
-        app:showAsAction="ifRoom" />
-
-    <item
         android:id="@+id/toolbar_preferences_menu_item"
         android:icon="@drawable/ic_more_vertical"
         android:title="@string/toolbar_preferences_menu_item_title"

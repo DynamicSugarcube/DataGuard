@@ -33,10 +33,6 @@ class DataGuardActivity : AppCompatActivity() {
             setTitle(R.string.applications_toolbar_title)
             setOnMenuItemClickListener { item ->
                 when (item.itemId) {
-                    R.id.toolbar_search_menu_item -> {
-                        // TODO Implement search
-                        false
-                    }
                     R.id.toolbar_preferences_menu_item -> {
                         showPreferences()
                         false

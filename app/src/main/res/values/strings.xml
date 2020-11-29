@@ -27,7 +27,6 @@
     <!-- Toolbar strings -->
     <string name="applications_toolbar_title">Applications</string>
     <string name="notifications_toolbar_title">Notifications</string>
-    <string name="toolbar_search_menu_item_title">Search</string>
     <string name="toolbar_preferences_menu_item_title">Preferences</string>
 
     <!-- Application card strings -->
