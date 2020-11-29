@@ -49,17 +49,17 @@ class DataGuardActivity : AppCompatActivity() {
         bottomNavigation = findViewById<BottomNavigationView>(R.id.bottom_navigation).apply {
             setOnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
-                    R.id.applications_list_menu_item -> {
+                    R.id.bottom_bar_applications_list_menu_item -> {
                         updateFragment(ApplicationsListFragment::class.java)
                         toolbar.setTitle(R.string.applications_toolbar_title)
                         true
                     }
-                    R.id.notifications_journal_menu_item -> {
+                    R.id.bottom_bar_notifications_journal_menu_item -> {
                         updateFragment(NotificationsJournalFragment::class.java)
                         toolbar.setTitle(R.string.notifications_toolbar_title)
                         true
                     }
-                    R.id.preferences_menu_item -> {
+                    R.id.bottom_bar_preferences_menu_item -> {
                         showPreferences()
                         false
                     }
