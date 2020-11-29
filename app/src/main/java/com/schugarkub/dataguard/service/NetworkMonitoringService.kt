@@ -3,7 +3,6 @@ package com.schugarkub.dataguard.service
 import android.app.*
 import android.content.Context
 import android.content.Intent
-import android.os.Binder
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.schugarkub.dataguard.DataGuardActivity
@@ -17,16 +16,16 @@ const val NETWORK_MONITORING_SERVICE_NOTIFICATION_ID = 100_000
 
 class NetworkMonitoringService : Service() {
 
-    private val binder = NetworkMonitoringBinder()
-
     private val monitorNetworkCoroutineScope = CoroutineScope(Dispatchers.IO)
 
     private lateinit var networkInspector: NetworkInspector
 
-    private var isMonitoringEnabled = false
+    override fun onBind(intent: Intent): IBinder? {
+        return null
+    }
 
-    override fun onBind(intent: Intent): IBinder {
-        return binder
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        return START_STICKY
     }
 
     override fun onCreate() {
@@ -93,7 +92,7 @@ class NetworkMonitoringService : Service() {
             }
         }
 
-        isMonitoringEnabled = true
+        isNetworkMonitoringEnabled = true
     }
 
     private fun stopNetworkMonitoring() {
@@ -104,20 +103,11 @@ class NetworkMonitoringService : Service() {
             monitorNetworkCoroutineScope.cancel()
         }
 
-        isMonitoringEnabled = false
+        isNetworkMonitoringEnabled = false
     }
 
-    inner class NetworkMonitoringBinder : Binder() {
+    companion object {
 
-        val isNetworkMonitoringEnabled: Boolean
-            get() = this@NetworkMonitoringService.isMonitoringEnabled
-
-        fun startNetworkMonitoring() {
-            this@NetworkMonitoringService.startNetworkMonitoring()
-        }
-
-        fun stopNetworkMonitoring() {
-            this@NetworkMonitoringService.stopNetworkMonitoring()
-        }
+        var isNetworkMonitoringEnabled: Boolean = false
     }
 }
