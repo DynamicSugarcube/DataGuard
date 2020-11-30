@@ -29,4 +29,7 @@
     <string name="enable_network_monitoring">Включить мониторинг сети</string>
     <string name="disable_network_monitoring">Выключить мониторинг сети</string>
     <string name="clean_up_notifications_journal">Очистить журнал уведомлений</string>
+
+    <!-- Debug strings -->
+    <string name="reset_network_usage_string">Статистика использования сети сброшена</string>
 </resources>

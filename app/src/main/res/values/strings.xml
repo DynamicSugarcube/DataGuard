@@ -41,4 +41,7 @@
     <string name="enable_network_monitoring">Enable network monitoring</string>
     <string name="disable_network_monitoring">Disable network monitoring</string>
     <string name="clean_up_notifications_journal">Clean up notifications journal</string>
+
+    <!-- Debug strings -->
+    <string name="reset_network_usage_string">Network usage stats reset</string>
 </resources>
