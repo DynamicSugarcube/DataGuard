@@ -32,4 +32,15 @@
 
     <!-- Debug strings -->
     <string name="reset_network_usage_string">Статистика использования сети сброшена</string>
+
+    <!-- Application settings strings -->
+    <string name="application_settings_toolbar_title">Расширенные настройки</string>
+
+    <string name="threshold_preference_category">Пороговое значение</string>
+    <string name="deviation_preference_category">Отклонение</string>
+
+    <string name="threshold_preference_title">Пороговое значение</string>
+    <string name="deviation_preference_title">Максимальное отклонение</string>
+    <string name="min_calibration_times_preference_title">Минимум калибровок</string>
+    <string name="max_calibration_times_preference_title">Максимум калибровок</string>
 </resources>

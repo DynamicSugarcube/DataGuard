@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">Data Guard</string>
+    <string name="title_activity_settings" translatable="false">SettingsActivity</string>
 
     <!-- Notifications strings -->
     <string name="suspicious_activity_detected_notification_channel_id" translatable="false">com.schugarkub.dataguard.SuspiciousActivityDetected</string>
@@ -23,7 +24,7 @@
     <string name="bottom_navigation_applications_list_menu_item_title">Applications</string>
     <string name="bottom_navigation_notifications_journal_menu_item_title">Notifications</string>
     <string name="bottom_navigation_preferences_menu_item_title">Preferences</string>
-    
+
     <!-- Toolbar strings -->
     <string name="applications_toolbar_title">Applications</string>
     <string name="notifications_toolbar_title">Notifications</string>
@@ -44,4 +45,22 @@
 
     <!-- Debug strings -->
     <string name="reset_network_usage_string">Network usage stats reset</string>
+
+    <!-- Application settings strings -->
+    <string name="application_settings_toolbar_title">Advanced settings</string>
+
+    <string name="threshold_preference_category">Threshold</string>
+    <string name="deviation_preference_category">Deviation</string>
+
+    <string name="threshold_preference_key" translatable="false">threshold_preference</string>
+    <string name="threshold_preference_title">TX bytes threshold</string>
+
+    <string name="deviation_preference_key" translatable="false">deviation_preference</string>
+    <string name="deviation_preference_title">Max bytes rate deviation</string>
+
+    <string name="min_calibration_times_preference_key" translatable="false">min_calibration_times_preference</string>
+    <string name="min_calibration_times_preference_title">Min calibration times</string>
+
+    <string name="max_calibration_times_preference_key" translatable="false">max_calibration_times_preference</string>
+    <string name="max_calibration_times_preference_title">Max calibration times</string>
 </resources>

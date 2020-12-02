@@ -29,6 +29,15 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name="com.schugarkub.dataguard.view.settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:exported="true">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".notifications.NotificationsDatabaseReceiver"
             android:enabled="true"

@@ -1,0 +1,31 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/threshold_preference_category">
+
+        <EditTextPreference
+            app:key="@string/threshold_preference_key"
+            app:title="@string/threshold_preference_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="@string/deviation_preference_category">
+
+        <EditTextPreference
+            app:key="@string/deviation_preference_key"
+            app:title="@string/deviation_preference_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="@string/min_calibration_times_preference_key"
+            app:title="@string/min_calibration_times_preference_title"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            app:key="@string/max_calibration_times_preference_key"
+            app:title="@string/max_calibration_times_preference_title"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
