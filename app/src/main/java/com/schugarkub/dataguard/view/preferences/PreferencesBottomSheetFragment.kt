@@ -10,6 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.service.NetworkMonitoringService
 import com.schugarkub.dataguard.notifications.ACTION_NOTIFICATIONS_DATABASE_CLEAN
+import com.schugarkub.dataguard.view.settings.SettingsActivity
 
 class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -25,6 +26,13 @@ class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
         savedInstanceState: Bundle?
     ): View? {
         val layout = inflater.inflate(R.layout.fragment_preferences_bottom_sheet, container, false)
+
+        layout.findViewById<TextView>(R.id.advanced_settings).apply {
+            setOnClickListener {
+                val intent = Intent(requireContext(), SettingsActivity::class.java)
+                requireContext().startActivity(intent)
+            }
+        }
 
         controlNetworkMonitoringView = layout.findViewById(R.id.control_network_monitoring)
         if (NetworkMonitoringService.isNetworkMonitoringEnabled) {

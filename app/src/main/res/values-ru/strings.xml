@@ -26,6 +26,7 @@
     <string name="toolbar_preferences_menu_item_title">Настройки</string>
 
     <!-- Preferences strings -->
+    <string name="advanced_settings">Расширенные настройки</string>
     <string name="enable_network_monitoring">Включить мониторинг сети</string>
     <string name="disable_network_monitoring">Выключить мониторинг сети</string>
     <string name="clean_up_notifications_journal">Очистить журнал уведомлений</string>

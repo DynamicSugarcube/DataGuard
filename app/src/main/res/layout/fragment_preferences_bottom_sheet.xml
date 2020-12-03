@@ -10,6 +10,15 @@
     tools:context=".view.preferences.PreferencesBottomSheetFragment">
 
     <TextView
+        android:id="@+id/advanced_settings"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawablePadding="@dimen/preference_icon_padding"
+        android:padding="@dimen/preference_item_padding"
+        android:text="@string/advanced_settings"
+        app:drawableStartCompat="@drawable/ic_preferences" />
+
+    <TextView
         android:id="@+id/control_network_monitoring"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

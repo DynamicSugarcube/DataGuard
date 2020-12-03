@@ -39,6 +39,7 @@
     <string name="notification_application_icon_description" translatable="false">Application icon</string>
 
     <!-- Preferences strings -->
+    <string name="advanced_settings">Advanced settings</string>
     <string name="enable_network_monitoring">Enable network monitoring</string>
     <string name="disable_network_monitoring">Disable network monitoring</string>
     <string name="clean_up_notifications_journal">Clean up notifications journal</string>

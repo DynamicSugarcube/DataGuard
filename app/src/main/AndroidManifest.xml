@@ -21,7 +21,9 @@
             android:enabled="true"
             android:exported="false" />
 
-        <activity android:name=".DataGuardActivity">
+        <activity
+            android:name=".DataGuardActivity"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,6 +34,7 @@
         <activity
             android:name="com.schugarkub.dataguard.view.settings.SettingsActivity"
             android:label="@string/title_activity_settings"
+            android:launchMode="singleTask"
             android:exported="true">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
