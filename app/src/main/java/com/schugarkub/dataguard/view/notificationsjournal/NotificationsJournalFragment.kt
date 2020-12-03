@@ -55,9 +55,11 @@ class NotificationsJournalFragment : Fragment() {
                 adapter = notificationJournalAdapter
             }
 
-        viewModel.notificationsLiveData.observe(this) {
-            notificationJournalAdapter.notifications = it
-        }
+        viewModel.notificationsLiveData.observe(
+            viewLifecycleOwner, { notifications ->
+                notificationJournalAdapter.notifications = notifications
+            }
+        )
 
         return layout
     }
