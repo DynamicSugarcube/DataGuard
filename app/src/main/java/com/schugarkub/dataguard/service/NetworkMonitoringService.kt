@@ -9,7 +9,10 @@ import com.schugarkub.dataguard.DataGuardActivity
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
+import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsDatabase
+import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsRepositoryImpl
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 import timber.log.Timber
 
 private const val NETWORK_MONITORING_SERVICE_NOTIFICATION_ID = 100_000
@@ -19,7 +22,10 @@ private const val STATE_MONITORING_DISABLED = -1
 
 class NetworkMonitoringService : Service() {
 
+    private val collectFlowsCoroutineScope = CoroutineScope(Dispatchers.IO)
     private val monitorNetworkCoroutineScope = CoroutineScope(Dispatchers.IO)
+
+    private lateinit var settingsRepository: ApplicationSettingsRepositoryImpl
 
     private lateinit var networkInspector: NetworkInspector
 
@@ -35,6 +41,27 @@ class NetworkMonitoringService : Service() {
         super.onCreate()
         networkInspector = NetworkInspector(applicationContext)
 
+        val dao = ApplicationSettingsDatabase.getInstance(applicationContext).dao
+        settingsRepository = ApplicationSettingsRepositoryImpl(dao)
+
+        collectFlowsCoroutineScope.launch {
+            settingsRepository.getBytesThresholdFlow().collect { value ->
+                networkInspector.onThresholdChanged(value)
+            }
+        }
+
+        collectFlowsCoroutineScope.launch {
+            settingsRepository.getMaxBytesRateDeviationFlow().collect { value ->
+                networkInspector.onMaxBytesRateDeviationChanged(value)
+            }
+        }
+
+        collectFlowsCoroutineScope.launch {
+            settingsRepository.getMinCalibrationTimesFlow().collect { value ->
+                networkInspector.onMinCalibrationTimesChanged(value)
+            }
+        }
+
         createNotificationChannels()
 
         setNetworkMonitoringState(STATE_MONITORING_ENABLED)
@@ -44,6 +71,11 @@ class NetworkMonitoringService : Service() {
     override fun onDestroy() {
         super.onDestroy()
         stopForeground(true)
+
+        if (collectFlowsCoroutineScope.isActive) {
+            collectFlowsCoroutineScope.cancel()
+        }
+
         setNetworkMonitoringState(STATE_MONITORING_DISABLED)
     }
 

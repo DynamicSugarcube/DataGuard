@@ -6,8 +6,8 @@ import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.os.Build
 import android.os.RemoteException
-import com.schugarkub.dataguard.constants.NetworkUsageConstants
 import com.schugarkub.dataguard.database.networkusage.NetworkUsageDatabase
+import com.schugarkub.dataguard.model.ApplicationSettings
 import com.schugarkub.dataguard.model.NetworkUsageEntity
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.utils.NetworkUsageRetriever
@@ -26,6 +26,28 @@ class NetworkInspector(private val context: Context) {
     private val networkUsageRetriever = NetworkUsageRetriever(context)
 
     private val networkUsageDatabaseDao = NetworkUsageDatabase.getInstance(context).dao
+
+    private var threshold = ApplicationSettings.DEFAULT_TX_BYTES_THRESHOLD
+    private var maxBytesRateDeviation = ApplicationSettings.DEFAULT_MAX_BYTES_RATE_DEVIATION
+    private var minCalibrationTimes = ApplicationSettings.DEFAULT_MIN_CALIBRATION_TIMES
+
+    fun onThresholdChanged(threshold: Long) {
+        synchronized(this) {
+            this.threshold = threshold
+        }
+    }
+
+    fun onMaxBytesRateDeviationChanged(deviation: Float) {
+        synchronized(this) {
+            maxBytesRateDeviation = deviation
+        }
+    }
+
+    fun onMinCalibrationTimesChanged(times: Int) {
+        synchronized(this) {
+            minCalibrationTimes = times
+        }
+    }
 
     suspend fun monitorNetwork(networkType: Int) {
         val calendar = Calendar.getInstance()
@@ -47,7 +69,7 @@ class NetworkInspector(private val context: Context) {
 
                         inspectRelatedEntities(networkType, uid, rxBytesRate, txBytesRate)
 
-                        if (txBytesRate > NetworkUsageConstants.TX_BYTES_THRESHOLD) {
+                        if (txBytesRate > threshold) {
                             if (checkUidDangerousPermissions(uid).isNotEmpty()) {
                                 val packageName = packageManager.getPackagesForUid(uid)?.get(0)
                                 packageName?.let {
@@ -79,10 +101,10 @@ class NetworkInspector(private val context: Context) {
             val entity = networkUsageDatabaseDao.getByPackageName(packageName)
             if (entity != null) {
                 entity.also {
-                    if (entity.txCalibrationTimes > NetworkUsageConstants.MIN_CALIBRATION_TIMES) {
+                    if (entity.txCalibrationTimes > minCalibrationTimes) {
                         val txDeviation =
                             abs(txBytesRate - entity.averageTxBytesRate).toDouble() / entity.averageTxBytesRate
-                        if (txDeviation > NetworkUsageConstants.MAX_BYTES_RATE_DEVIATION) {
+                        if (txDeviation > maxBytesRateDeviation) {
                             NotificationsHelper.sendNotification(
                                 context,
                                 NotificationsHelper.SuspiciousActivityType.HIGH_DEVIATION,
@@ -120,8 +142,8 @@ class NetworkInspector(private val context: Context) {
             packages?.forEach { packageName ->
                 val packageInfo =
                     packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-                val permissions = packageInfo.requestedPermissions
-                val permissionsFlags = packageInfo.requestedPermissionsFlags
+                val permissions = packageInfo.requestedPermissions ?: emptyArray<String>()
+                val permissionsFlags = packageInfo.requestedPermissionsFlags ?: intArrayOf()
 
                 if (permissions.isNullOrEmpty() or permissionsFlags.isEmpty()) {
                     return emptyList()

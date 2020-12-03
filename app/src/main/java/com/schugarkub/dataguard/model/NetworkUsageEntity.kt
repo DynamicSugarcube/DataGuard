@@ -3,7 +3,6 @@ package com.schugarkub.dataguard.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.schugarkub.dataguard.constants.NetworkUsageConstants.MAX_CALIBRATION_TIMES
 import com.schugarkub.dataguard.database.networkusage.NETWORK_USAGE_DATABASE_NAME
 
 @Entity(tableName = NETWORK_USAGE_DATABASE_NAME)
@@ -38,18 +37,14 @@ data class NetworkUsageEntity(
         if (newRate > 0) {
             when (type) {
                 BytesType.RX -> {
-                    if (rxCalibrationTimes < MAX_CALIBRATION_TIMES) {
-                        val total = rxCalibrationTimes * averageRxBytesRate + newRate
-                        rxCalibrationTimes++
-                        averageRxBytesRate = total / rxCalibrationTimes
-                    }
+                    val total = rxCalibrationTimes * averageRxBytesRate + newRate
+                    rxCalibrationTimes++
+                    averageRxBytesRate = total / rxCalibrationTimes
                 }
                 BytesType.TX -> {
-                    if (txCalibrationTimes < MAX_CALIBRATION_TIMES) {
-                        val total = txCalibrationTimes * averageTxBytesRate + newRate
-                        txCalibrationTimes++
-                        averageTxBytesRate = total / txCalibrationTimes
-                    }
+                    val total = txCalibrationTimes * averageTxBytesRate + newRate
+                    txCalibrationTimes++
+                    averageTxBytesRate = total / txCalibrationTimes
                 }
             }
         }
