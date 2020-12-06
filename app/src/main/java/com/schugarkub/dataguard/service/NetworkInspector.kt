@@ -29,7 +29,7 @@ class NetworkInspector(private val context: Context) {
 
     private var threshold = ApplicationSettings.DEFAULT_TX_BYTES_THRESHOLD
     private var maxBytesRateDeviation = ApplicationSettings.DEFAULT_MAX_BYTES_RATE_DEVIATION
-    private var minCalibrationTimes = ApplicationSettings.DEFAULT_MIN_CALIBRATION_TIMES
+    private var learningIterations = ApplicationSettings.DEFAULT_LEARNING_ITERATIONS
 
     fun onThresholdChanged(threshold: Long) {
         synchronized(this) {
@@ -43,9 +43,9 @@ class NetworkInspector(private val context: Context) {
         }
     }
 
-    fun onMinCalibrationTimesChanged(times: Int) {
+    fun onLearningIterationsChanged(times: Int) {
         synchronized(this) {
-            minCalibrationTimes = times
+            learningIterations = times
         }
     }
 
@@ -101,7 +101,7 @@ class NetworkInspector(private val context: Context) {
             val entity = networkUsageDatabaseDao.getByPackageName(packageName)
             if (entity != null) {
                 entity.also {
-                    if (entity.txCalibrationTimes > minCalibrationTimes) {
+                    if (entity.txCalibrationTimes > learningIterations) {
                         val txDeviation =
                             abs(txBytesRate - entity.averageTxBytesRate).toDouble() / entity.averageTxBytesRate
                         if (txDeviation > maxBytesRateDeviation) {

@@ -17,13 +17,8 @@
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
-            app:key="@string/min_calibration_times_preference_key"
-            app:title="@string/min_calibration_times_preference_title"
-            app:useSimpleSummaryProvider="true" />
-
-        <EditTextPreference
-            app:key="@string/max_calibration_times_preference_key"
-            app:title="@string/max_calibration_times_preference_title"
+            app:key="@string/learning_iterations_preference_key"
+            app:title="@string/learning_iterations_preference_title"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

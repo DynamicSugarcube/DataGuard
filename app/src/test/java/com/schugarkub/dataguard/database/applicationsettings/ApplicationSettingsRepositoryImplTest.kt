@@ -77,59 +77,30 @@ class ApplicationSettingsRepositoryImplTest {
     }
 
     @Test
-    fun getMinCalibrationTimes_emptyDatabase_returnDefault() = runBlocking {
-        val actual = repository.getMinCalibrationTimesFlow().first()
+    fun getLearningIterations_emptyDatabase_returnDefault() = runBlocking {
+        val actual = repository.getLearningIterationsFlow().first()
 
-        Assert.assertEquals(ApplicationSettings.DEFAULT_MIN_CALIBRATION_TIMES, actual)
+        Assert.assertEquals(ApplicationSettings.DEFAULT_LEARNING_ITERATIONS, actual)
     }
 
     @Test
-    fun getMinCalibrationTimes_updateOnce_returnNewValue() = runBlocking {
+    fun getLearningIterations_updateOnce_returnNewValue() = runBlocking {
         val value = 100
-        repository.updateMinCalibrationTimes(value)
+        repository.updateLearningIterations(value)
 
-        val actual = repository.getMinCalibrationTimesFlow().first()
+        val actual = repository.getLearningIterationsFlow().first()
 
         Assert.assertEquals(value, actual)
     }
 
     @Test
-    fun getMinCalibrationTimes_updateSeveralTimes_returnLastValue() = runBlocking {
+    fun getLearningIterations_updateSeveralTimes_returnLastValue() = runBlocking {
         val values = listOf(100, 200, 300)
         values.forEach { value ->
-            repository.updateMinCalibrationTimes(value)
+            repository.updateLearningIterations(value)
         }
 
-        val actual = repository.getMinCalibrationTimesFlow().first()
-
-        Assert.assertEquals(values.last(), actual)
-    }
-
-    @Test
-    fun getMaxCalibrationTimes_emptyDatabase_returnDefault() = runBlocking {
-        val actual = repository.getMaxCalibrationTimesFlow().first()
-
-        Assert.assertEquals(ApplicationSettings.DEFAULT_MAX_CALIBRATION_TIMES, actual)
-    }
-
-    @Test
-    fun getMaxCalibrationTimes_updateOnce_returnNewValue() = runBlocking {
-        val value = 10_000
-        repository.updateMaxCalibrationTimes(value)
-
-        val actual = repository.getMaxCalibrationTimesFlow().first()
-
-        Assert.assertEquals(value, actual)
-    }
-
-    @Test
-    fun getMaxCalibrationTimes_updateSeveralTimes_returnLastValue() = runBlocking {
-        val values = listOf(10_000, 20_000, 30_000)
-        values.forEach { value ->
-            repository.updateMaxCalibrationTimes(value)
-        }
-
-        val actual = repository.getMaxCalibrationTimesFlow().first()
+        val actual = repository.getLearningIterationsFlow().first()
 
         Assert.assertEquals(values.last(), actual)
     }

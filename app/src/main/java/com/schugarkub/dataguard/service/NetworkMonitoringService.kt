@@ -57,8 +57,8 @@ class NetworkMonitoringService : Service() {
         }
 
         collectFlowsCoroutineScope.launch {
-            settingsRepository.getMinCalibrationTimesFlow().collect { value ->
-                networkInspector.onMinCalibrationTimesChanged(value)
+            settingsRepository.getLearningIterationsFlow().collect { value ->
+                networkInspector.onLearningIterationsChanged(value)
             }
         }
 

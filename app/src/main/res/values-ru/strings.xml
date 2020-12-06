@@ -42,6 +42,5 @@
 
     <string name="threshold_preference_title">Пороговое значение</string>
     <string name="deviation_preference_title">Максимальное отклонение</string>
-    <string name="min_calibration_times_preference_title">Минимум калибровок</string>
-    <string name="max_calibration_times_preference_title">Максимум калибровок</string>
+    <string name="learning_iterations_preference_title">Обучающие итерации</string>
 </resources>

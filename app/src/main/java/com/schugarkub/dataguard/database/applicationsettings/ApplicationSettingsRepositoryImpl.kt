@@ -21,17 +21,10 @@ class ApplicationSettingsRepositoryImpl(private val dao: ApplicationSettingsDao)
         }
     }
 
-    override fun getMinCalibrationTimesFlow(): Flow<Int> {
+    override fun getLearningIterationsFlow(): Flow<Int> {
         val settingsFlow = dao.getSettingsFlow()
         return settingsFlow.map { settings ->
-            settings?.minCalibrationTimes ?: ApplicationSettings.DEFAULT_MIN_CALIBRATION_TIMES
-        }
-    }
-
-    override fun getMaxCalibrationTimesFlow(): Flow<Int> {
-        val settingsFlow = dao.getSettingsFlow()
-        return settingsFlow.map { settings ->
-            settings?.maxCalibrationTimes ?: ApplicationSettings.DEFAULT_MAX_CALIBRATION_TIMES
+            settings?.learningIterations ?: ApplicationSettings.DEFAULT_LEARNING_ITERATIONS
         }
     }
 
@@ -57,24 +50,13 @@ class ApplicationSettingsRepositoryImpl(private val dao: ApplicationSettingsDao)
         }
     }
 
-    override suspend fun updateMinCalibrationTimes(times: Int) {
+    override suspend fun updateLearningIterations(iterations: Int) {
         var settings = dao.getSettings()
         if (settings == null) {
-            settings = ApplicationSettings(minCalibrationTimes = times)
+            settings = ApplicationSettings(learningIterations = iterations)
             dao.insert(settings)
         } else {
-            settings.minCalibrationTimes = times
-            dao.update(settings)
-        }
-    }
-
-    override suspend fun updateMaxCalibrationTimes(times: Int) {
-        var settings = dao.getSettings()
-        if (settings == null) {
-            settings = ApplicationSettings(maxCalibrationTimes = times)
-            dao.insert(settings)
-        } else {
-            settings.maxCalibrationTimes = times
+            settings.learningIterations = iterations
             dao.update(settings)
         }
     }

@@ -20,8 +20,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     private var thresholdPreference: EditTextPreference? = null
     private var maxDeviationPreference: EditTextPreference? = null
-    private var minCalibrationTimesPreference: EditTextPreference? = null
-    private var maxCalibrationTimesPreference: EditTextPreference? = null
+    private var learningIterationsPreference: EditTextPreference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -34,12 +33,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
             requireContext().getString(R.string.deviation_preference_key)
         )
 
-        minCalibrationTimesPreference = findPreference(
-            requireContext().getString(R.string.min_calibration_times_preference_key)
-        )
-
-        maxCalibrationTimesPreference = findPreference(
-            requireContext().getString(R.string.max_calibration_times_preference_key)
+        learningIterationsPreference = findPreference(
+            requireContext().getString(R.string.learning_iterations_preference_key)
         )
     }
 
@@ -52,8 +47,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
         setupThresholdPreference()
         setupMaxBytesRateDeviationPreference()
-        setupMinCalibrationTimesPreference()
-        setupMaxCalibrationTimesPreference()
+        setupLearningIterationsPreference()
     }
 
     private fun setupThresholdPreference() {
@@ -90,9 +84,9 @@ class SettingsFragment : PreferenceFragmentCompat() {
         }
     }
 
-    private fun setupMinCalibrationTimesPreference() {
-        minCalibrationTimesPreference?.let { preference ->
-            viewModel.minCalibrationTimesLiveData.observe(
+    private fun setupLearningIterationsPreference() {
+        learningIterationsPreference?.let { preference ->
+            viewModel.learningIterationsLiveData.observe(
                 viewLifecycleOwner, { times ->
                     preference.text = times.toString()
                 }
@@ -102,24 +96,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 PreferenceOnBindEditTextListener(MaxLength.CALIBRATION_TIMES)
             )
             preference.setOnPreferenceChangeListener { _, newValue ->
-                viewModel.onMinCalibrationTimesChangedCallback(newValue)
-            }
-        }
-    }
-
-    private fun setupMaxCalibrationTimesPreference() {
-        maxCalibrationTimesPreference?.let { preference ->
-            viewModel.maxCalibrationTimesLiveData.observe(
-                viewLifecycleOwner, { times ->
-                    preference.text = times.toString()
-                }
-            )
-
-            preference.setOnBindEditTextListener(
-                PreferenceOnBindEditTextListener(MaxLength.CALIBRATION_TIMES)
-            )
-            preference.setOnPreferenceChangeListener { _, newValue ->
-                viewModel.onMaxCalibrationTimesChangedCallback(newValue)
+                viewModel.onLearningIterationsChangedCallback(newValue)
             }
         }
     }

@@ -59,9 +59,6 @@
     <string name="deviation_preference_key" translatable="false">deviation_preference</string>
     <string name="deviation_preference_title">Max bytes rate deviation</string>
 
-    <string name="min_calibration_times_preference_key" translatable="false">min_calibration_times_preference</string>
-    <string name="min_calibration_times_preference_title">Min calibration times</string>
-
-    <string name="max_calibration_times_preference_key" translatable="false">max_calibration_times_preference</string>
-    <string name="max_calibration_times_preference_title">Max calibration times</string>
+    <string name="learning_iterations_preference_key" translatable="false">learning_iterations_preference</string>
+    <string name="learning_iterations_preference_title">Learning iterations</string>
 </resources>

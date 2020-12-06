@@ -19,10 +19,8 @@ class SettingsViewModel(application: Application) : ViewModel() {
         repository.getBytesThresholdFlow().asLiveData(viewModelScope.coroutineContext)
     val maxBytesRateDeviationLiveData =
         repository.getMaxBytesRateDeviationFlow().asLiveData(viewModelScope.coroutineContext)
-    val minCalibrationTimesLiveData =
-        repository.getMinCalibrationTimesFlow().asLiveData(viewModelScope.coroutineContext)
-    val maxCalibrationTimesLiveData =
-        repository.getMaxCalibrationTimesFlow().asLiveData(viewModelScope.coroutineContext)
+    val learningIterationsLiveData =
+        repository.getLearningIterationsFlow().asLiveData(viewModelScope.coroutineContext)
 
     val onThresholdChangedCallback = { value: Any ->
         try {
@@ -51,28 +49,15 @@ class SettingsViewModel(application: Application) : ViewModel() {
         }
     }
 
-    val onMinCalibrationTimesChangedCallback = { value: Any ->
+    val onLearningIterationsChangedCallback = { value: Any ->
         try {
-            val times = value.toString().toInt()
+            val iterations = value.toString().toInt()
             viewModelScope.launch {
-                repository.updateMinCalibrationTimes(times)
+                repository.updateLearningIterations(iterations)
             }
             true
         } catch (e: NumberFormatException) {
             Timber.w(e, "Couldn't update min calibration times")
-            false
-        }
-    }
-
-    val onMaxCalibrationTimesChangedCallback = { value: Any ->
-        try {
-            val times = value.toString().toInt()
-            viewModelScope.launch {
-                repository.updateMaxCalibrationTimes(times)
-            }
-            true
-        } catch (e: NumberFormatException) {
-            Timber.w(e, "Couldn't update max calibration times")
             false
         }
     }
