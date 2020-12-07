@@ -155,7 +155,7 @@ class NetworkInspector(private val context: Context) {
                         val level = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                             permissionInfo.protection
                         } else {
-                            permissionInfo.protectionLevel
+                            permissionInfo.protectionLevel and PermissionInfo.PROTECTION_MASK_BASE
                         }
                         if (level == PermissionInfo.PROTECTION_DANGEROUS) {
                             dangerousGrantedPermissions.add(permissions[i])
