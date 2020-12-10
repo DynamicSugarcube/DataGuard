@@ -1,6 +1,8 @@
 package com.schugarkub.dataguard.database.applicationsettings
 
 import com.schugarkub.dataguard.model.ApplicationSettings
+import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepository
+import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepositoryImpl
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert

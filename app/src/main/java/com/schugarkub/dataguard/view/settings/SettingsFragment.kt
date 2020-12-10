@@ -9,13 +9,17 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.EditTextPreference
 import androidx.preference.PreferenceFragmentCompat
+import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.utils.floatToPercent
-import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
 import com.schugarkub.dataguard.viewmodel.SettingsViewModel
+import com.schugarkub.dataguard.viewmodel.SettingsViewModelFactory
+import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat() {
 
+    @Inject
+    lateinit var viewModelFactory: SettingsViewModelFactory
     private lateinit var viewModel: SettingsViewModel
 
     private var thresholdPreference: EditTextPreference? = null
@@ -38,12 +42,17 @@ class SettingsFragment : PreferenceFragmentCompat() {
         )
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        (requireActivity().application as DataGuardApplication)
+            .fragmentComponent.inject(this)
 
-        val viewModelFactory = BaseViewModelFactory(requireActivity().application)
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(SettingsViewModel::class.java)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupThresholdPreference()
         setupMaxBytesRateDeviationPreference()

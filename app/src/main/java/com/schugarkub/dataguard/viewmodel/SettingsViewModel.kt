@@ -1,19 +1,16 @@
 package com.schugarkub.dataguard.viewmodel
 
-import android.app.Application
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsDatabase
-import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsRepositoryImpl
+import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepository
 import com.schugarkub.dataguard.utils.percentToFloat
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import javax.inject.Inject
 
-class SettingsViewModel(application: Application) : ViewModel() {
-
-    private val dao = ApplicationSettingsDatabase.getInstance(application.applicationContext).dao
-    private val repository = ApplicationSettingsRepositoryImpl(dao)
+class SettingsViewModel(private val repository: ApplicationSettingsRepository) : ViewModel() {
 
     val thresholdLiveData =
         repository.getBytesThresholdFlow().asLiveData(viewModelScope.coroutineContext)
@@ -59,6 +56,20 @@ class SettingsViewModel(application: Application) : ViewModel() {
         } catch (e: NumberFormatException) {
             Timber.w(e, "Couldn't update min calibration times")
             false
+        }
+    }
+}
+
+class SettingsViewModelFactory @Inject constructor(
+    private val repository: ApplicationSettingsRepository
+) : ViewModelProvider.Factory {
+
+    @Suppress("unchecked_cast")
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return when {
+            modelClass.isAssignableFrom(SettingsViewModel::class.java) ->
+                SettingsViewModel(repository) as T
+            else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

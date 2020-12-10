@@ -10,7 +10,7 @@ import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
 import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsDatabase
-import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsRepositoryImpl
+import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepositoryImpl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber

@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard.database.applicationsettings
+package com.schugarkub.dataguard.repository.applicationsettings
 
 import kotlinx.coroutines.flow.Flow
 

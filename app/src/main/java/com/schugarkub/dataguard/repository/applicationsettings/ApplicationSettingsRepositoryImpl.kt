@@ -1,11 +1,16 @@
-package com.schugarkub.dataguard.database.applicationsettings
+package com.schugarkub.dataguard.repository.applicationsettings
 
+import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsDao
 import com.schugarkub.dataguard.model.ApplicationSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ApplicationSettingsRepositoryImpl(private val dao: ApplicationSettingsDao) :
-    ApplicationSettingsRepository {
+@Singleton
+class ApplicationSettingsRepositoryImpl @Inject constructor(
+    private val dao: ApplicationSettingsDao
+) : ApplicationSettingsRepository {
 
     override fun getBytesThresholdFlow(): Flow<Long> {
         val settingsFlow = dao.getSettingsFlow()
