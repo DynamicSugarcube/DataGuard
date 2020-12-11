@@ -1,10 +1,11 @@
-package com.schugarkub.dataguard.database.applicationsettings
+package com.schugarkub.dataguard.repository.applicationsettings
 
+import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsDao
 import com.schugarkub.dataguard.model.ApplicationSettings
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class FakeApplicationSettingsDao : ApplicationSettingsDao{
+class FakeApplicationSettingsDao : ApplicationSettingsDao {
 
     private var settings: ApplicationSettings? = null
 
