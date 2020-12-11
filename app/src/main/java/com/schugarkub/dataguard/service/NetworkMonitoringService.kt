@@ -4,7 +4,7 @@ import android.app.*
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import com.schugarkub.dataguard.DataGuardActivity
+import com.schugarkub.dataguard.view.DataGuardActivity
 import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE

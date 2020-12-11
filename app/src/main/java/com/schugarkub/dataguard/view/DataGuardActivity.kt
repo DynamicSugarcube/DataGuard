@@ -1,4 +1,4 @@
-package com.schugarkub.dataguard
+package com.schugarkub.dataguard.view
 
 import android.app.AppOpsManager
 import android.content.*
@@ -10,6 +10,7 @@ import androidx.core.app.AppOpsManagerCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.service.NetworkMonitoringService
 import com.schugarkub.dataguard.view.applicationslist.ApplicationsListFragment
 import com.schugarkub.dataguard.view.notificationsjournal.NotificationsJournalFragment

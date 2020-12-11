@@ -22,7 +22,7 @@
             android:exported="false" />
 
         <activity
-            android:name=".DataGuardActivity"
+            android:name=".view.DataGuardActivity"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.google.android.material.appbar.MaterialToolbar
-import com.schugarkub.dataguard.DataGuardActivity
+import com.schugarkub.dataguard.view.DataGuardActivity
 import com.schugarkub.dataguard.R
 
 class SettingsActivity : AppCompatActivity() {
