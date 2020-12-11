@@ -10,7 +10,6 @@
     <string name="threshold_reached_notification_description">Threshold reached</string>
     <string name="high_deviation_notification_text">%1$s: High deviation detected</string>
     <string name="high_deviation_notification_description">High deviation detected</string>
-    <string name="unknown_activity_notification_text">%1$s: Unknown activity</string>
     <string name="network_monitoring_notification_channel_id" translatable="false">com.schugarkub.dataguard.NetworkMonitoring</string>
     <string name="network_monitoring_notification_channel_name">Network monitoring</string>
     <string name="network_monitoring_notification_title">Network monitoring enabled</string>

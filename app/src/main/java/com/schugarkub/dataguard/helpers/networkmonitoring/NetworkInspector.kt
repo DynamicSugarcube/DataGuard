@@ -1,16 +1,16 @@
 package com.schugarkub.dataguard.helpers.networkmonitoring
 
-import android.app.Application
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.os.Build
 import android.os.RemoteException
 import com.schugarkub.dataguard.helpers.networkusage.NetworkUsageRetriever
+import com.schugarkub.dataguard.helpers.notifications.NotificationSender
+import com.schugarkub.dataguard.helpers.notifications.NotificationType
 import com.schugarkub.dataguard.model.ApplicationSettings
 import com.schugarkub.dataguard.model.NetworkUsageEntity
 import com.schugarkub.dataguard.model.NetworkUsageInfo
-import com.schugarkub.dataguard.notifications.NotificationsHelper
 import com.schugarkub.dataguard.repository.networkusage.NetworkUsageRepository
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -21,13 +21,11 @@ import kotlin.math.abs
 private const val MONITOR_NETWORK_PERIOD_MS = 10_000L
 
 class NetworkInspector @Inject constructor(
-    application: Application, // TODO Remove when context injected
     private val packageManager: PackageManager,
     private val networkUsageRetriever: NetworkUsageRetriever,
-    private val networkUsageRepository: NetworkUsageRepository
+    private val networkUsageRepository: NetworkUsageRepository,
+    private val notificationSender: NotificationSender
 ) {
-
-    private val context = application.applicationContext
 
     private var threshold = ApplicationSettings.DEFAULT_TX_BYTES_THRESHOLD
     private var maxBytesRateDeviation = ApplicationSettings.DEFAULT_MAX_BYTES_RATE_DEVIATION
@@ -75,9 +73,8 @@ class NetworkInspector @Inject constructor(
                             if (checkUidDangerousPermissions(uid).isNotEmpty()) {
                                 val packageName = packageManager.getPackagesForUid(uid)?.get(0)
                                 packageName?.let {
-                                    NotificationsHelper.sendNotification(
-                                        context,
-                                        NotificationsHelper.SuspiciousActivityType.THRESHOLD_REACHED,
+                                    notificationSender.sendNotification(
+                                        NotificationType.THRESHOLD_REACHED,
                                         networkType,
                                         packageName
                                     )
@@ -107,9 +104,8 @@ class NetworkInspector @Inject constructor(
                         val txDeviation =
                             abs(txBytesRate - entity.averageTxBytesRate).toDouble() / entity.averageTxBytesRate
                         if (txDeviation > maxBytesRateDeviation) {
-                            NotificationsHelper.sendNotification(
-                                context,
-                                NotificationsHelper.SuspiciousActivityType.HIGH_DEVIATION,
+                            notificationSender.sendNotification(
+                                NotificationType.HIGH_DEVIATION,
                                 networkType,
                                 packageName
                             )

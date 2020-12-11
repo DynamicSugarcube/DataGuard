@@ -7,7 +7,6 @@
     <string name="threshold_reached_notification_description">Достигнуто пороговое значение</string>
     <string name="high_deviation_notification_text">%1$s: Замечено высокое отклонение</string>
     <string name="high_deviation_notification_description">Замечено высокое отклонение</string>
-    <string name="unknown_activity_notification_text">%1$s: Неопознанная активность</string>
     <string name="network_monitoring_notification_channel_name">Мониторинг сети</string>
     <string name="network_monitoring_notification_title">Мониторинг сети включён</string>
 

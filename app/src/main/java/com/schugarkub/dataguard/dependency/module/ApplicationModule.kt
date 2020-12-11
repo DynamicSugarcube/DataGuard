@@ -17,6 +17,11 @@ class ApplicationModule(private val application: Application) {
     }
 
     @Provides
+    fun provideApplicationContext(): Context {
+        return application.applicationContext
+    }
+
+    @Provides
     fun providePackageManager(): PackageManager {
         return application.packageManager
     }

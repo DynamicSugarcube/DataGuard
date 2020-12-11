@@ -41,16 +41,6 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name=".notifications.NotificationsDatabaseReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="com.schugarkub.dataguard.action.NOTIFICATION_SENT" />
-                <action android:name="com.schugarkub.dataguard.action.NOTIFICATIONS_DATABASE_CLEAN" />
-            </intent-filter>
-        </receiver>
-
         <!-- Debug receivers -->
         <receiver
             android:name=".debug.DebugNetworkUsageDatabaseReceiver"
