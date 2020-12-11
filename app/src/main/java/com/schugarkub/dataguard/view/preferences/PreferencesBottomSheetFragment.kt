@@ -6,11 +6,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.service.NetworkMonitoringService
-import com.schugarkub.dataguard.notifications.ACTION_NOTIFICATIONS_DATABASE_CLEAN
 import com.schugarkub.dataguard.view.settings.SettingsActivity
+import com.schugarkub.dataguard.viewmodel.PreferencesBottomSheetViewModel
+import com.schugarkub.dataguard.viewmodel.PreferencesBottomSheetViewModelFactory
+import javax.inject.Inject
 
 class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
 
@@ -18,8 +22,21 @@ class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
         const val TAG = "PreferencesBottomSheetFragment"
     }
 
+    @Inject
+    lateinit var viewModelFactory: PreferencesBottomSheetViewModelFactory
+    private lateinit var viewModel: PreferencesBottomSheetViewModel
+
     private lateinit var controlNetworkMonitoringView: TextView
     private lateinit var cleanUpNotificationsView: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        (requireActivity().application as DataGuardApplication).fragmentComponent.inject(this)
+
+        viewModel = ViewModelProvider(this, viewModelFactory)
+            .get(PreferencesBottomSheetViewModel::class.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -66,7 +83,7 @@ class PreferencesBottomSheetFragment : BottomSheetDialogFragment() {
         }
 
         cleanUpNotificationsView.setOnClickListener {
-            requireContext().sendBroadcast(Intent(ACTION_NOTIFICATIONS_DATABASE_CLEAN))
+            viewModel.deleteAllNotifications()
             dismiss()
         }
     }

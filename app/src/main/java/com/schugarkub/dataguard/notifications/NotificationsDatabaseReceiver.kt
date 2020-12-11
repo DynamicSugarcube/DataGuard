@@ -17,8 +17,6 @@ import java.util.*
 const val ACTION_NOTIFICATION_SENT = "com.schugarkub.dataguard.action.NOTIFICATION_SENT"
 const val ACTION_NOTIFICATIONS_DATABASE_UPDATED =
     "com.schugarkub.dataguard.action.NOTIFICATIONS_DATABASE_UPDATED"
-const val ACTION_NOTIFICATIONS_DATABASE_CLEAN =
-    "com.schugarkub.dataguard.action.NOTIFICATIONS_DATABASE_CLEAN"
 
 const val EXTRA_NOTIFICATION_DESCRIPTION = "com.schugarkub.dataguard.extra.NOTIFICATION_DESCRIPTION"
 const val EXTRA_NOTIFICATION_APP_PACKAGE_NAME =
@@ -41,7 +39,6 @@ class NotificationsDatabaseReceiver : BroadcastReceiver() {
         if (intent != null && context != null) {
             when (intent.action) {
                 ACTION_NOTIFICATION_SENT -> writeToDatabase(context, intent)
-                ACTION_NOTIFICATIONS_DATABASE_CLEAN -> cleanDatabase(context)
             }
         }
     }
@@ -66,15 +63,6 @@ class NotificationsDatabaseReceiver : BroadcastReceiver() {
                     notificationsDao.insert(notification)
                     context.sendBroadcast(Intent(ACTION_NOTIFICATIONS_DATABASE_UPDATED))
                 }
-            }
-        }
-    }
-
-    private fun cleanDatabase(context: Context) {
-        if (::notificationsDao.isInitialized) {
-            coroutineScope.launch {
-                notificationsDao.clean()
-                context.sendBroadcast(Intent(ACTION_NOTIFICATIONS_DATABASE_UPDATED))
             }
         }
     }
