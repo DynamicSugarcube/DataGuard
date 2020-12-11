@@ -1,18 +1,17 @@
-package com.schugarkub.dataguard.utils
+package com.schugarkub.dataguard.helpers.networkusage
 
 import android.app.usage.NetworkStats
 import android.app.usage.NetworkStatsManager
-import android.content.Context
 import android.os.RemoteException
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import timber.log.Timber
+import javax.inject.Inject
 
-class NetworkUsageRetriever(context: Context) {
+class NetworkUsageRetrieverImpl @Inject constructor(
+    private val manager: NetworkStatsManager
+) : NetworkUsageRetriever {
 
-    private val networkStatsManager = context.getSystemService(Context.NETWORK_STATS_SERVICE)
-            as NetworkStatsManager
-
-    fun getNetworkUsageInfo(
+    override fun getNetworkUsageInfo(
         networkType: Int,
         startTime: Long,
         endTime: Long
@@ -21,7 +20,7 @@ class NetworkUsageRetriever(context: Context) {
 
         try {
             val networkStats =
-                networkStatsManager.querySummary(networkType, null, startTime, endTime)
+                manager.querySummary(networkType, null, startTime, endTime)
 
             val bucket = NetworkStats.Bucket()
             while (networkStats.hasNextBucket()) {

@@ -1,22 +1,24 @@
 package com.schugarkub.dataguard.viewmodel
 
-import android.app.Application
+import android.content.pm.PackageManager
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
+import com.schugarkub.dataguard.helpers.networkusage.NetworkUsageRetriever
 import com.schugarkub.dataguard.model.AppPackageInfo
 import com.schugarkub.dataguard.model.NetworkUsageInfo
-import com.schugarkub.dataguard.utils.NetworkUsageRetriever
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.util.*
+import javax.inject.Inject
 
-class ApplicationsListViewModel(application: Application) : ViewModel() {
-
-    private val packageManager = application.packageManager
-    private val networkUsageRetriever = NetworkUsageRetriever(application.applicationContext)
+class ApplicationsListViewModel(
+    private val packageManager: PackageManager,
+    private val networkUsageRetriever: NetworkUsageRetriever
+) : ViewModel() {
 
     val applicationsLiveData by lazy {
         MutableLiveData<List<AppPackageInfo>>()
@@ -83,6 +85,21 @@ class ApplicationsListViewModel(application: Application) : ViewModel() {
                 name = it.packageName,
                 uid = it.uid
             )
+        }
+    }
+}
+
+class ApplicationsListViewModelFactory @Inject constructor(
+    private val packageManager: PackageManager,
+    private val networkUsageRetriever: NetworkUsageRetriever
+) : ViewModelProvider.Factory {
+
+    @Suppress("unchecked_cast")
+    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+        return when {
+            modelClass.isAssignableFrom(ApplicationsListViewModel::class.java) ->
+                ApplicationsListViewModel(packageManager, networkUsageRetriever) as T
+            else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

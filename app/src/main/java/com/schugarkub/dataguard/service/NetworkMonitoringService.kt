@@ -1,19 +1,20 @@
 package com.schugarkub.dataguard.service
 
 import android.app.*
-import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.schugarkub.dataguard.DataGuardActivity
+import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_MOBILE
 import com.schugarkub.dataguard.constants.NetworkTypeConstants.NETWORK_TYPE_WIFI
-import com.schugarkub.dataguard.database.applicationsettings.ApplicationSettingsDatabase
-import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepositoryImpl
+import com.schugarkub.dataguard.helpers.networkmonitoring.NetworkInspector
+import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val NETWORK_MONITORING_SERVICE_NOTIFICATION_ID = 100_000
 
@@ -25,9 +26,14 @@ class NetworkMonitoringService : Service() {
     private val collectFlowsCoroutineScope = CoroutineScope(Dispatchers.IO)
     private val monitorNetworkCoroutineScope = CoroutineScope(Dispatchers.IO)
 
-    private lateinit var settingsRepository: ApplicationSettingsRepositoryImpl
+    @Inject
+    lateinit var notificationManager: NotificationManager
 
-    private lateinit var networkInspector: NetworkInspector
+    @Inject
+    lateinit var settingsRepository: ApplicationSettingsRepository
+
+    @Inject
+    lateinit var networkInspector: NetworkInspector
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -39,10 +45,8 @@ class NetworkMonitoringService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        networkInspector = NetworkInspector(applicationContext)
 
-        val dao = ApplicationSettingsDatabase.getInstance(applicationContext).dao
-        settingsRepository = ApplicationSettingsRepositoryImpl(dao)
+        (application as DataGuardApplication).serviceComponent.inject(this)
 
         collectFlowsCoroutineScope.launch {
             settingsRepository.getBytesThresholdFlow().collect { value ->
@@ -92,10 +96,8 @@ class NetworkMonitoringService : Service() {
             NotificationManager.IMPORTANCE_HIGH
         )
 
-        with(applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager) {
-            createNotificationChannel(networkMonitoringChannel)
-            createNotificationChannel(suspiciousActivityChannel)
-        }
+        notificationManager.createNotificationChannel(networkMonitoringChannel)
+        notificationManager.createNotificationChannel(suspiciousActivityChannel)
     }
 
     private fun buildForegroundNotification(): Notification {

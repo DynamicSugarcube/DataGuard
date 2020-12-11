@@ -1,9 +1,7 @@
 package com.schugarkub.dataguard
 
 import android.app.Application
-import com.schugarkub.dataguard.dependency.component.DaggerApplicationComponent
-import com.schugarkub.dataguard.dependency.component.DaggerFragmentComponent
-import com.schugarkub.dataguard.dependency.component.FragmentComponent
+import com.schugarkub.dataguard.dependency.component.*
 import com.schugarkub.dataguard.dependency.module.ApplicationModule
 import com.schugarkub.dataguard.dependency.module.ApplicationSettingsModule
 import timber.log.Timber
@@ -17,6 +15,10 @@ class DataGuardApplication : Application() {
         .build()
 
     val fragmentComponent: FragmentComponent = DaggerFragmentComponent.builder()
+        .applicationComponent(applicationComponent)
+        .build()
+
+    val serviceComponent: ServiceComponent = DaggerServiceComponent.builder()
         .applicationComponent(applicationComponent)
         .build()
 

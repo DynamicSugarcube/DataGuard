@@ -8,12 +8,16 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
 import com.schugarkub.dataguard.viewmodel.ApplicationsListViewModel
+import com.schugarkub.dataguard.viewmodel.ApplicationsListViewModelFactory
+import javax.inject.Inject
 
 class ApplicationsListFragment : Fragment() {
 
+    @Inject
+    lateinit var viewModelFactory: ApplicationsListViewModelFactory
     private lateinit var viewModel: ApplicationsListViewModel
 
     private lateinit var applicationsListRecyclerView: RecyclerView
@@ -23,7 +27,8 @@ class ApplicationsListFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val viewModelFactory = BaseViewModelFactory(requireActivity().application)
+        (requireActivity().application as DataGuardApplication).fragmentComponent.inject(this)
+
         viewModel = ViewModelProvider(this, viewModelFactory)
             .get(ApplicationsListViewModel::class.java)
 
