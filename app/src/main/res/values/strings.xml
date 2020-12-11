@@ -43,14 +43,12 @@
     <string name="disable_network_monitoring">Disable network monitoring</string>
     <string name="clean_up_notifications_journal">Clean up notifications journal</string>
 
-    <!-- Debug strings -->
-    <string name="reset_network_usage_string">Network usage stats reset</string>
-
     <!-- Application settings strings -->
     <string name="application_settings_toolbar_title">Advanced settings</string>
 
     <string name="threshold_preference_category">Threshold</string>
     <string name="deviation_preference_category">Deviation</string>
+    <string name="reset_settings_preference_category">Reset settings</string>
 
     <string name="threshold_preference_key" translatable="false">threshold_preference</string>
     <string name="threshold_preference_title">TX bytes threshold</string>
@@ -60,4 +58,13 @@
 
     <string name="learning_iterations_preference_key" translatable="false">learning_iterations_preference</string>
     <string name="learning_iterations_preference_title">Learning iterations</string>
+
+    <string name="reset_stats_preference_key" translatable="false">reset_stats</string>
+    <string name="reset_stats_preference_title">Reset stats</string>
+
+    <string name="reset_settings_preference_key" translatable="false">reset_settings</string>
+    <string name="reset_settings_preference_title">Reset to default settings</string>
+
+    <string name="reset_network_usage_string">Network usage stats reset</string>
+    <string name="reset_settings_string">Settings reset</string>
 </resources>

@@ -8,6 +8,7 @@ import android.widget.EditText
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.preference.EditTextPreference
+import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
@@ -25,6 +26,8 @@ class SettingsFragment : PreferenceFragmentCompat() {
     private var thresholdPreference: EditTextPreference? = null
     private var maxDeviationPreference: EditTextPreference? = null
     private var learningIterationsPreference: EditTextPreference? = null
+    private var resetStatsPreference: Preference? = null
+    private var resetSettingsPreference: Preference? = null
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.root_preferences, rootKey)
@@ -40,6 +43,14 @@ class SettingsFragment : PreferenceFragmentCompat() {
         learningIterationsPreference = findPreference(
             requireContext().getString(R.string.learning_iterations_preference_key)
         )
+
+        resetStatsPreference = findPreference(
+            requireContext().getString(R.string.reset_stats_preference_key)
+        )
+
+        resetSettingsPreference = findPreference(
+            requireContext().getString(R.string.reset_settings_preference_key)
+        )
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,6 +64,16 @@ class SettingsFragment : PreferenceFragmentCompat() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        resetStatsPreference?.setOnPreferenceClickListener {
+            viewModel.onResetStats(requireContext())
+            true
+        }
+
+        resetSettingsPreference?.setOnPreferenceClickListener {
+            viewModel.onResetSettings(requireContext())
+            true
+        }
 
         setupThresholdPreference()
         setupMaxBytesRateDeviationPreference()
@@ -71,7 +92,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 PreferenceOnBindEditTextListener(MaxLength.THRESHOLD)
             )
             preference.setOnPreferenceChangeListener { _, newValue ->
-                viewModel.onThresholdChangedCallback(newValue)
+                viewModel.onThresholdChanged(newValue)
             }
         }
     }
@@ -88,7 +109,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 PreferenceOnBindEditTextListener(MaxLength.DEVIATION)
             )
             preference.setOnPreferenceChangeListener { _, newValue ->
-                viewModel.onMaxBytesRateDeviationChangedCallback(newValue)
+                viewModel.onMaxBytesRateDeviationChanged(newValue)
             }
         }
     }
@@ -105,7 +126,7 @@ class SettingsFragment : PreferenceFragmentCompat() {
                 PreferenceOnBindEditTextListener(MaxLength.CALIBRATION_TIMES)
             )
             preference.setOnPreferenceChangeListener { _, newValue ->
-                viewModel.onLearningIterationsChangedCallback(newValue)
+                viewModel.onLearningIterationsChanged(newValue)
             }
         }
     }

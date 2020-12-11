@@ -1,29 +1,52 @@
 package com.schugarkub.dataguard.viewmodel
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
+import com.schugarkub.dataguard.R
 import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepository
+import com.schugarkub.dataguard.repository.networkusage.NetworkUsageRepository
 import com.schugarkub.dataguard.utils.percentToFloat
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
-class SettingsViewModel(private val repository: ApplicationSettingsRepository) : ViewModel() {
+class SettingsViewModel(
+    private val applicationSettingsRepository: ApplicationSettingsRepository,
+    private val networkUsageRepository: NetworkUsageRepository
+) : ViewModel() {
 
-    val thresholdLiveData =
-        repository.getBytesThresholdFlow().asLiveData(viewModelScope.coroutineContext)
-    val maxBytesRateDeviationLiveData =
-        repository.getMaxBytesRateDeviationFlow().asLiveData(viewModelScope.coroutineContext)
-    val learningIterationsLiveData =
-        repository.getLearningIterationsFlow().asLiveData(viewModelScope.coroutineContext)
+    val thresholdLiveData = applicationSettingsRepository
+        .getBytesThresholdFlow().asLiveData(viewModelScope.coroutineContext)
+    val maxBytesRateDeviationLiveData = applicationSettingsRepository
+        .getMaxBytesRateDeviationFlow().asLiveData(viewModelScope.coroutineContext)
+    val learningIterationsLiveData = applicationSettingsRepository
+        .getLearningIterationsFlow().asLiveData(viewModelScope.coroutineContext)
 
-    val onThresholdChangedCallback = { value: Any ->
-        try {
+    fun onResetStats(context: Context) {
+        viewModelScope.launch {
+            networkUsageRepository.deleteAllEntities()
+            Toast.makeText(context, R.string.reset_network_usage_string, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    fun onResetSettings(context: Context) {
+        viewModelScope.launch {
+            applicationSettingsRepository.resetSettings()
+            Toast.makeText(context, R.string.reset_settings_string, Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+
+    fun onThresholdChanged(value: Any): Boolean {
+        return try {
             val threshold = value.toString().toLong()
             viewModelScope.launch {
-                repository.updateThreshold(threshold)
+                applicationSettingsRepository.updateThreshold(threshold)
             }
             true
         } catch (e: NumberFormatException) {
@@ -32,12 +55,12 @@ class SettingsViewModel(private val repository: ApplicationSettingsRepository) :
         }
     }
 
-    val onMaxBytesRateDeviationChangedCallback = { value: Any ->
-        try {
+    fun onMaxBytesRateDeviationChanged(value: Any): Boolean {
+        return try {
             val percent = value.toString().toInt()
             val deviation = percentToFloat(percent)
             viewModelScope.launch {
-                repository.updateMaxBytesRateDeviation(deviation)
+                applicationSettingsRepository.updateMaxBytesRateDeviation(deviation)
             }
             true
         } catch (e: NumberFormatException) {
@@ -46,11 +69,11 @@ class SettingsViewModel(private val repository: ApplicationSettingsRepository) :
         }
     }
 
-    val onLearningIterationsChangedCallback = { value: Any ->
-        try {
+    fun onLearningIterationsChanged(value: Any): Boolean {
+        return try {
             val iterations = value.toString().toInt()
             viewModelScope.launch {
-                repository.updateLearningIterations(iterations)
+                applicationSettingsRepository.updateLearningIterations(iterations)
             }
             true
         } catch (e: NumberFormatException) {
@@ -61,14 +84,15 @@ class SettingsViewModel(private val repository: ApplicationSettingsRepository) :
 }
 
 class SettingsViewModelFactory @Inject constructor(
-    private val repository: ApplicationSettingsRepository
+    private val applicationSettingsRepository: ApplicationSettingsRepository,
+    private val networkUsageRepository: NetworkUsageRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("unchecked_cast")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return when {
             modelClass.isAssignableFrom(SettingsViewModel::class.java) ->
-                SettingsViewModel(repository) as T
+                SettingsViewModel(applicationSettingsRepository, networkUsageRepository) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }

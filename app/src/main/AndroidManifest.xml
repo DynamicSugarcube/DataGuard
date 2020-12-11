@@ -40,17 +40,6 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-
-        <!-- Debug receivers -->
-        <receiver
-            android:name=".debug.DebugNetworkUsageDatabaseReceiver"
-            android:enabled="true"
-            android:exported="true"
-            tools:ignore="ExportedReceiver">
-            <intent-filter>
-                <action android:name="com.schugarkub.dataguard.action.CLEAN_NETWORK_USAGE_DATABASE" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>
