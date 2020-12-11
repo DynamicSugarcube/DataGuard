@@ -1,9 +1,5 @@
 package com.schugarkub.dataguard.view.notificationsjournal
 
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,14 +8,17 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.schugarkub.dataguard.DataGuardApplication
 import com.schugarkub.dataguard.R
-import com.schugarkub.dataguard.notifications.ACTION_NOTIFICATIONS_DATABASE_UPDATED
-import com.schugarkub.dataguard.viewmodel.BaseViewModelFactory
-import com.schugarkub.dataguard.viewmodel.NotificationJournalViewModel
+import com.schugarkub.dataguard.viewmodel.NotificationsJournalViewModel
+import com.schugarkub.dataguard.viewmodel.NotificationsJournalViewModelFactory
+import javax.inject.Inject
 
 class NotificationsJournalFragment : Fragment() {
 
-    private lateinit var viewModel: NotificationJournalViewModel
+    @Inject
+    lateinit var viewModelFactory: NotificationsJournalViewModelFactory
+    private lateinit var viewModel: NotificationsJournalViewModel
 
     private lateinit var notificationJournalRecyclerView: RecyclerView
     private lateinit var notificationJournalAdapter: NotificationJournalAdapter
@@ -28,16 +27,10 @@ class NotificationsJournalFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        requireContext().registerReceiver(
-            notificationsDatabaseUpdatedReceiver,
-            IntentFilter(ACTION_NOTIFICATIONS_DATABASE_UPDATED)
-        )
+        (requireActivity().application as DataGuardApplication).fragmentComponent.inject(this)
 
-        val viewModelFactory = BaseViewModelFactory(requireActivity().application)
         viewModel = ViewModelProvider(this, viewModelFactory)
-            .get(NotificationJournalViewModel::class.java)
-
-        viewModel.syncNotifications()
+            .get(NotificationsJournalViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -62,23 +55,5 @@ class NotificationsJournalFragment : Fragment() {
         )
 
         return layout
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        requireContext().unregisterReceiver(notificationsDatabaseUpdatedReceiver)
-    }
-
-    private val notificationsDatabaseUpdatedReceiver = object : BroadcastReceiver() {
-
-        override fun onReceive(context: Context?, intent: Intent?) {
-            intent?.let {
-                if (it.action == ACTION_NOTIFICATIONS_DATABASE_UPDATED) {
-                    if (::viewModel.isInitialized) {
-                        viewModel.syncNotifications()
-                    }
-                }
-            }
-        }
     }
 }

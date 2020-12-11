@@ -12,8 +12,6 @@ class BaseViewModelFactory(private val application: Application) :
         return when {
             modelClass.isAssignableFrom(ApplicationsListViewModel::class.java) ->
                 ApplicationsListViewModel(application) as T
-            modelClass.isAssignableFrom(NotificationJournalViewModel::class.java) ->
-                NotificationJournalViewModel(application) as T
             else -> throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
