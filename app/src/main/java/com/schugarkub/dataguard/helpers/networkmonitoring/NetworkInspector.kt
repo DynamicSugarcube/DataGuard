@@ -6,12 +6,12 @@ import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.os.Build
 import android.os.RemoteException
-import com.schugarkub.dataguard.database.networkusage.NetworkUsageDatabase
 import com.schugarkub.dataguard.helpers.networkusage.NetworkUsageRetriever
 import com.schugarkub.dataguard.model.ApplicationSettings
 import com.schugarkub.dataguard.model.NetworkUsageEntity
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.notifications.NotificationsHelper
+import com.schugarkub.dataguard.repository.networkusage.NetworkUsageRepository
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.*
@@ -21,15 +21,13 @@ import kotlin.math.abs
 private const val MONITOR_NETWORK_PERIOD_MS = 10_000L
 
 class NetworkInspector @Inject constructor(
-    application: Application, // TODO Remove when networkUsageDatabaseDao injected
+    application: Application, // TODO Remove when context injected
     private val packageManager: PackageManager,
-    private val networkUsageRetriever: NetworkUsageRetriever
+    private val networkUsageRetriever: NetworkUsageRetriever,
+    private val networkUsageRepository: NetworkUsageRepository
 ) {
 
     private val context = application.applicationContext
-
-    // TODO Remove when networkUsageDatabaseDao injected
-    private val networkUsageDatabaseDao = NetworkUsageDatabase.getInstance(context).dao
 
     private var threshold = ApplicationSettings.DEFAULT_TX_BYTES_THRESHOLD
     private var maxBytesRateDeviation = ApplicationSettings.DEFAULT_MAX_BYTES_RATE_DEVIATION
@@ -102,7 +100,7 @@ class NetworkInspector @Inject constructor(
         txBytesRate: Long
     ) {
         packageManager.getPackagesForUid(uid)?.forEach { packageName ->
-            val entity = networkUsageDatabaseDao.getByPackageName(packageName)
+            val entity = networkUsageRepository.getEntityByPackageName(packageName)
             if (entity != null) {
                 entity.also {
                     if (entity.txCalibrationTimes > learningIterations) {
@@ -122,7 +120,7 @@ class NetworkInspector @Inject constructor(
                     if (rxBytesRate > 0 || txBytesRate > 0) {
                         it.updateAverageRxBytesRate(rxBytesRate)
                         it.updateAverageTxBytesRate(txBytesRate)
-                        networkUsageDatabaseDao.update(it)
+                        networkUsageRepository.updateEntity(it)
                     }
                 }
             } else {
@@ -131,7 +129,7 @@ class NetworkInspector @Inject constructor(
                     averageRxBytesRate = rxBytesRate,
                     averageTxBytesRate = txBytesRate
                 ).also {
-                    networkUsageDatabaseDao.insert(it)
+                    networkUsageRepository.addEntity(it)
                 }
             }
         }

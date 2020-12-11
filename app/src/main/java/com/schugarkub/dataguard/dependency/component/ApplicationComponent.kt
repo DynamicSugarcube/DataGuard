@@ -9,6 +9,7 @@ import com.schugarkub.dataguard.dependency.module.NetworkUsageModule
 import com.schugarkub.dataguard.dependency.module.NotificationsModule
 import com.schugarkub.dataguard.helpers.networkusage.NetworkUsageRetriever
 import com.schugarkub.dataguard.repository.applicationsettings.ApplicationSettingsRepository
+import com.schugarkub.dataguard.repository.networkusage.NetworkUsageRepository
 import com.schugarkub.dataguard.repository.notifications.NotificationsRepository
 import dagger.Component
 
@@ -27,6 +28,8 @@ interface ApplicationComponent {
     fun getNotificationManager(): NotificationManager
 
     fun getNetworkUsageRetriever(): NetworkUsageRetriever
+
+    fun getNetworkUsageRepository(): NetworkUsageRepository
 
     fun getApplicationSettingsRepository(): ApplicationSettingsRepository
 
