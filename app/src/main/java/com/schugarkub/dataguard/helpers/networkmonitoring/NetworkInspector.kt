@@ -4,7 +4,6 @@ import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
 import android.content.pm.PermissionInfo
 import android.os.Build
-import android.os.RemoteException
 import com.schugarkub.dataguard.helpers.networkusage.NetworkUsageRetriever
 import com.schugarkub.dataguard.helpers.notifications.NotificationSender
 import com.schugarkub.dataguard.helpers.notifications.NotificationType
@@ -13,12 +12,18 @@ import com.schugarkub.dataguard.model.NetworkUsageEntity
 import com.schugarkub.dataguard.model.NetworkUsageInfo
 import com.schugarkub.dataguard.repository.networkusage.NetworkUsageRepository
 import kotlinx.coroutines.delay
-import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.math.abs
 
 private const val MONITOR_NETWORK_PERIOD_MS = 10_000L
+
+private data class NetworkStatsBundle(
+    val uid: Int,
+    val networkType: Int,
+    val rxBytesRate: Long,
+    val txBytesRate: Long
+)
 
 class NetworkInspector @Inject constructor(
     private val packageManager: PackageManager,
@@ -56,7 +61,8 @@ class NetworkInspector @Inject constructor(
             val endTime = calendar.timeInMillis
             val startTime = endTime - MONITOR_NETWORK_PERIOD_MS
 
-            val usageStats = networkUsageRetriever.getNetworkUsageInfo(networkType, startTime, endTime)
+            val usageStats =
+                networkUsageRetriever.getNetworkUsageInfo(networkType, startTime, endTime)
 
             if (lastUsageStats.isNotEmpty()) {
                 usageStats.forEach { currentUsage ->
@@ -67,20 +73,12 @@ class NetworkInspector @Inject constructor(
                         val rxBytesRate = current.rxBytes - previous.rxBytes
                         val txBytesRate = current.txBytes - previous.txBytes
 
-                        inspectRelatedEntities(networkType, uid, rxBytesRate, txBytesRate)
+                        val networkStatsBundle = NetworkStatsBundle(
+                            uid, networkType, rxBytesRate, txBytesRate
+                        )
 
-                        if (txBytesRate > threshold) {
-                            if (checkUidDangerousPermissions(uid).isNotEmpty()) {
-                                val packageName = packageManager.getPackagesForUid(uid)?.get(0)
-                                packageName?.let {
-                                    notificationSender.sendNotification(
-                                        NotificationType.THRESHOLD_REACHED,
-                                        networkType,
-                                        packageName
-                                    )
-                                }
-                            }
-                        }
+                        checkThreshold(networkStatsBundle)
+                        checkDeviation(networkStatsBundle)
                     }
                 }
             }
@@ -90,82 +88,82 @@ class NetworkInspector @Inject constructor(
         }
     }
 
-    private suspend fun inspectRelatedEntities(
-        networkType: Int,
-        uid: Int,
-        rxBytesRate: Long,
-        txBytesRate: Long
-    ) {
-        packageManager.getPackagesForUid(uid)?.forEach { packageName ->
-            val entity = networkUsageRepository.getEntityByPackageName(packageName)
-            if (entity != null) {
-                entity.also {
-                    if (entity.txCalibrationTimes > learningIterations) {
-                        val txDeviation =
-                            abs(txBytesRate - entity.averageTxBytesRate).toDouble() / entity.averageTxBytesRate
-                        if (txDeviation > maxBytesRateDeviation) {
-                            notificationSender.sendNotification(
-                                NotificationType.HIGH_DEVIATION,
-                                networkType,
-                                packageName
-                            )
-                            return
-                        }
-                    }
-
-                    if (rxBytesRate > 0 || txBytesRate > 0) {
-                        it.updateAverageRxBytesRate(rxBytesRate)
-                        it.updateAverageTxBytesRate(txBytesRate)
-                        networkUsageRepository.updateEntity(it)
-                    }
-                }
-            } else {
-                NetworkUsageEntity(
-                    packageName = packageName,
-                    averageRxBytesRate = rxBytesRate,
-                    averageTxBytesRate = txBytesRate
-                ).also {
-                    networkUsageRepository.addEntity(it)
-                }
+    private fun checkThreshold(bundle: NetworkStatsBundle) {
+        if (bundle.txBytesRate > threshold && hasDangerousPermissions(bundle.uid)) {
+            packageManager.getPackagesForUid(bundle.uid)?.get(0)?.let { packageName ->
+                notificationSender.sendNotification(
+                    NotificationType.THRESHOLD_REACHED,
+                    bundle.networkType,
+                    packageName
+                )
             }
         }
     }
 
-    @Suppress("deprecation")
-    private fun checkUidDangerousPermissions(uid: Int): List<String> {
-        val dangerousGrantedPermissions = mutableListOf<String>()
+    private suspend fun checkDeviation(bundle: NetworkStatsBundle) {
+        val packageName = packageManager.getPackagesForUid(bundle.uid)?.get(0) ?: return
 
-        try {
-            val packages = packageManager.getPackagesForUid(uid)
-            packages?.forEach { packageName ->
-                val packageInfo =
-                    packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
-                val permissions = packageInfo.requestedPermissions ?: emptyArray<String>()
-                val permissionsFlags = packageInfo.requestedPermissionsFlags ?: intArrayOf()
-
-                if (permissions.isNullOrEmpty() or permissionsFlags.isEmpty()) {
-                    return emptyList()
-                }
-
-                for (i in permissions.indices) {
-                    if (permissionsFlags[i].and(PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0) {
-                        val permissionInfo = packageManager.getPermissionInfo(permissions[i], 0)
-                        val level = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                            permissionInfo.protection
-                        } else {
-                            permissionInfo.protectionLevel and PermissionInfo.PROTECTION_MASK_BASE
-                        }
-                        if (level == PermissionInfo.PROTECTION_DANGEROUS) {
-                            dangerousGrantedPermissions.add(permissions[i])
-                        }
-                    }
-                }
-            }
-        } catch (e: RemoteException) {
-            Timber.e(e, "Couldn't read permissions for uid %d", uid)
-            return emptyList()
+        var entity = networkUsageRepository.getEntityByPackageName(packageName)
+        if (entity == null) {
+            entity = NetworkUsageEntity(
+                packageName = packageName,
+                averageRxBytesRate = bundle.rxBytesRate,
+                averageTxBytesRate = bundle.txBytesRate
+            )
+            networkUsageRepository.addEntity(entity)
+            return
         }
 
-        return dangerousGrantedPermissions
+        if (entity.txCalibrationTimes > learningIterations) {
+            val deviation = abs(bundle.txBytesRate - entity.averageTxBytesRate).toDouble() /
+                    entity.averageTxBytesRate
+            if (deviation > maxBytesRateDeviation && hasDangerousPermissions(bundle.uid)) {
+                notificationSender.sendNotification(
+                    NotificationType.HIGH_DEVIATION, bundle.networkType, packageName
+                )
+            }
+        }
+
+        if (bundle.rxBytesRate > 0 || bundle.txBytesRate > 0) {
+            entity.updateAverageRxBytesRate(bundle.rxBytesRate)
+            entity.updateAverageTxBytesRate(bundle.txBytesRate)
+            networkUsageRepository.updateEntity(entity)
+        }
+    }
+
+    @Suppress("deprecation")
+    private fun hasDangerousPermissions(uid: Int): Boolean {
+        val packageName = packageManager.getPackagesForUid(uid)?.get(0) ?: return false
+
+        val packageInfo = packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+        val permissions = packageInfo.requestedPermissions
+        val flags = packageInfo.requestedPermissionsFlags
+
+        if (permissions.isEmpty() || flags.isEmpty()) {
+            return false
+        }
+
+        for (index in permissions.indices) {
+            val currentPermission = permissions[index]
+            val currentFlag = flags[index]
+
+            if (currentFlag and PackageInfo.REQUESTED_PERMISSION_GRANTED == 0) {
+                continue
+            }
+
+            val permissionInfo = packageManager.getPermissionInfo(currentPermission, 0)
+
+            val level = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                permissionInfo.protection
+            } else {
+                permissionInfo.protectionLevel and PermissionInfo.PROTECTION_MASK_BASE
+            }
+
+            if (level == PermissionInfo.PROTECTION_DANGEROUS) {
+                return true
+            }
+        }
+
+        return false
     }
 }
